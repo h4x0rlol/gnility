@@ -1,15 +1,27 @@
 const express = require("express");
 const path = require("path");
-const app = express();
+// const { ExpressPeerServer } = require("peer");
 
-let port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(__dirname);
-  console.log("Listening Port " + port);
-});
+const frontend = express();
+const backend = express();
 
-app.use(express.static(__dirname + "/dist"));
+const frontendServer = frontend.listen(3000);
+// const backendServer = backend.listen(5000);
 
-app.get("*", (req, res) => {
+// react
+frontend.use(express.static(__dirname + "/dist"));
+
+frontend.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "index.html"));
 });
+
+// peerjs
+// const peerServer = ExpressPeerServer(backendServer, {
+//   path: "/chat",
+//   debug: true,
+// });
+
+// backend.use("/peerjs", peerServer, (req, res) => {
+//   console.log(req.data);
+//   // console.log(res.data);
+// });
