@@ -12,6 +12,7 @@ type MyState = {
   conn: any;
   connState: any;
   rpeer: any;
+  message: string;
 };
 
 class Home extends React.Component<MyProps, MyState> {
@@ -21,12 +22,16 @@ class Home extends React.Component<MyProps, MyState> {
     conn: null,
     connState: "not connected",
     rpeer: null,
+    message: null,
   };
 
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.connect = this.connect.bind(this);
+    this.handleMessage = this.handleMessage.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
+
     this.state.peer.on("open", async (id) => {
       this.setState({ peer_id: id });
     });
@@ -53,6 +58,11 @@ class Home extends React.Component<MyProps, MyState> {
     console.log(event.target.value);
   }
 
+  handleMessage(event) {
+    this.setState({ message: event.target.value });
+    console.log(event.target.value);
+  }
+
   connect() {
     if (!this.state.rpeer) {
       console.log("undf peer");
@@ -68,6 +78,14 @@ class Home extends React.Component<MyProps, MyState> {
     }
   }
 
+  sendMessage() {
+    if (this.state.conn) {
+      this.state.conn.send(this.state.message);
+    } else {
+      console.log("no con?");
+    }
+  }
+
   render() {
     return (
       <div>
@@ -77,7 +95,15 @@ class Home extends React.Component<MyProps, MyState> {
           value={this.state.rpeer}
           onChange={this.handleChange}
         />
+        <br />
         <button onClick={this.connect}>less go</button>
+        <br />
+        <input
+          type="text"
+          value={this.state.message}
+          onChange={this.handleMessage}
+        />
+        <button onClick={this.sendMessage}>less go</button>
       </div>
     );
   }
