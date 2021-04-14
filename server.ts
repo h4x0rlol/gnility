@@ -1,27 +1,23 @@
 const express = require("express");
 const path = require("path");
-// const { ExpressPeerServer } = require("peer");
+// import Peer from "peerjs";
 
-const frontend = express();
-const backend = express();
+const LOBBY_NAME = "gnility";
+const app = express();
 
-const frontendServer = frontend.listen(3000);
-// const backendServer = backend.listen(5000);
+const frontendServer = app.listen(3000);
 
-// react
-frontend.use(express.static(__dirname + "/dist"));
+app.use(express.static(__dirname + "/dist"));
 
-frontend.get("*", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "index.html"));
 });
 
-// peerjs
-// const peerServer = ExpressPeerServer(backendServer, {
-//   path: "/chat",
-//   debug: true,
+// console.log("trying to create lobby");
+// const lobby = new Peer(LOBBY_NAME);
+// lobby.on("open", function (id) {
+//   console.log("Lobby peer ID is: " + id);
 // });
-
-// backend.use("/peerjs", peerServer, (req, res) => {
-//   console.log(req.data);
-//   // console.log(res.data);
+// lobby.on("connection", function (conn) {
+//   console.log("lobby connection", conn.peer);
 // });

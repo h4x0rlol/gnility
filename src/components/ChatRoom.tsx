@@ -37,7 +37,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
 
-    this.state.peer.on("open", async (id) => {
+    this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
     });
 
