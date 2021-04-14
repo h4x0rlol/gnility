@@ -47,50 +47,49 @@ function Home(props: any) {
       window.setTimeout(expire, 1000);
     }
     expire();
-  }, []);
 
-  peer.on("open", (id) => {
-    setPeer_id(id);
-    const lconn = peer.connect(LOBBY_NAME);
-    lconn.on("open", () => {
-      console.log("connected to lobby");
-      const lobby_query = () => {
-        lconn.send("QUERY");
-        if (connState === "no") {
-          lconn.send("READY");
-        }
-        window.setTimeout(lobby_query, 1000);
-      };
-      lobby_query();
-    });
-    lconn.on("data", (data) => {
-      console.log("setting lobby", data);
-      setInlobby(data);
-    });
-  });
-
-  peer.on("connection", (conn) => {
-    console.log("got connection from", conn.peer);
-    console.log("stateconn", stateConn);
-    if (stateConn == null) {
-      setConn(conn);
-      setConnState("playin");
-      conn.on("data", (data) => {
-        setMessages((oldArray) => [
-          ...oldArray,
-          {
-            position: "left",
-            type: "text",
-            text: data,
-          },
-        ]);
-        console.log("recived", data);
+    peer.on("open", (id) => {
+      setPeer_id(id);
+      const lconn = peer.connect(LOBBY_NAME);
+      lconn.on("open", () => {
+        console.log("connected to lobby");
+        const lobby_query = () => {
+          lconn.send("QUERY");
+          if (connState === "no") {
+            lconn.send("READY");
+          }
+          window.setTimeout(lobby_query, 1000);
+        };
+        lobby_query();
       });
-    } else {
-      console.log("already connected");
-      conn.close();
-    }
-  });
+      lconn.on("data", (data) => {
+        console.log("setting lobby", data);
+        setInlobby(data);
+      });
+    });
+
+    peer.on("connection", (conn) => {
+      console.log("got connection from", conn.peer);
+      if (stateConn == null) {
+        setConn(conn);
+        setConnState("playin");
+        conn.on("data", (data) => {
+          setMessages((oldArray) => [
+            ...oldArray,
+            {
+              position: "left",
+              type: "text",
+              text: data,
+            },
+          ]);
+          console.log("recived", data);
+        });
+      } else {
+        console.log("already connected");
+        conn.close();
+      }
+    });
+  }, []);
 
   function handleMessage(event) {
     setMessage(event.target.value);
