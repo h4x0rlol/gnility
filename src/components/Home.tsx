@@ -19,7 +19,7 @@ function Home(props: any) {
   const [rpeer, setRpeer] = useState("");
 
   useEffect(() => {
-    // console.log("trying to create lobby");
+    console.log("trying to create lobby");
     const lobby = new Peer(LOBBY_NAME);
     let peers = {};
     lobby.on("open", function (id) {
@@ -47,13 +47,13 @@ function Home(props: any) {
       window.setTimeout(expire, 1000);
     }
     expire();
-  });
+  }, []);
 
   peer.on("open", (id) => {
     setPeer_id(id);
     const lconn = peer.connect(LOBBY_NAME);
     lconn.on("open", () => {
-      // console.log("connected to lobby");
+      console.log("connected to lobby");
       const lobby_query = () => {
         lconn.send("QUERY");
         if (connState === "no") {
@@ -64,7 +64,7 @@ function Home(props: any) {
       lobby_query();
     });
     lconn.on("data", (data) => {
-      // console.log("setting lobby", data);
+      console.log("setting lobby", data);
       setInlobby(data);
     });
   });
@@ -123,7 +123,7 @@ function Home(props: any) {
         setConnState("playin");
       });
       newConn.on("data", (data) => {
-        // console.log("Received back", data);
+        console.log("Received back", data);
         setMessages((oldArray) => [
           ...oldArray,
           {
