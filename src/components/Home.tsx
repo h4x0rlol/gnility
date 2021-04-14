@@ -23,7 +23,7 @@ function Home(props: any) {
     const lobby = new Peer(LOBBY_NAME);
     let peers = {};
     lobby.on("open", function (id) {
-      // console.log("Lobby peer ID is: " + id);
+      console.log("Lobby peer ID is: " + id);
     });
 
     lobby.on("connection", function (conn) {
@@ -70,10 +70,11 @@ function Home(props: any) {
   });
 
   peer.on("connection", (conn) => {
-    // console.log("got connection from", conn.peer);
+    console.log("got connection from", conn.peer);
+    console.log("stateconn", stateConn);
     if (stateConn == null) {
       setConn(conn);
-      setConnState("o");
+      setConnState("playin");
       conn.on("data", (data) => {
         setMessages((oldArray) => [
           ...oldArray,
@@ -83,11 +84,11 @@ function Home(props: any) {
             text: data,
           },
         ]);
-        console.log(data);
+        console.log("recived", data);
       });
     } else {
       console.log("already connected");
-      // conn.close();
+      conn.close();
     }
   });
 
@@ -99,24 +100,27 @@ function Home(props: any) {
     return inlobby[Math.floor(Math.random() * inlobby.length)];
   }
 
-  async function join() {
+  async function connect() {
     console.log(`in lobby now : ${inlobby}`);
     let randomPeer = await getRandomPeer();
     console.log(`random peer ${randomPeer}`);
     if (!randomPeer) {
       console.log("undf peer");
     }
-    if (randomPeer === peer) {
-      randomPeer = await getRandomPeer();
-      // setConn(undefined);
-    } else {
+    if (randomPeer === peer.id) {
+      console.log("ONI RAVNI");
+      console.log(stateConn);
+      // setConn(null);
+      // setInterval(() => connect(), 3000);
+    }
+    if (randomPeer != peer.id) {
       console.log("connect to", randomPeer);
       let newConn = peer.connect(randomPeer);
       // console.log(newConn);
       newConn.on("open", () => {
         console.log("connection open");
         setConn(newConn);
-        setConnState("x");
+        setConnState("playin");
       });
       newConn.on("data", (data) => {
         // console.log("Received back", data);
@@ -159,7 +163,7 @@ function Home(props: any) {
       {inlobby.map((item, i) => (
         <li key={i}>{item}</li>
       ))}
-      <button onClick={join}>join</button>
+      <button onClick={connect}>join</button>
       <br />
       <div>
         <h1>this is my peer{peer.id}</h1>
