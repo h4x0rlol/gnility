@@ -47,7 +47,7 @@ function Home(props: any) {
     function expire() {
       for (let k in peers) {
         let now = new Date().getTime();
-        if (now - peers[k] > 3000) {
+        if (now - peers[k] > 1000) {
           delete peers[k];
         }
       }
