@@ -7,16 +7,23 @@ import { MessageList } from "react-chat-elements";
 
 const LOBBY_NAME = "gnility";
 
+const userStates = {
+  NOT_CONNECTED: "not_connected",
+  CONNECTING: "connecting",
+  CONNECTED: "connected",
+};
+
 function Home(props: any) {
   const [peer, setPeer] = useState(new Peer());
   const [peer_id, setPeer_id] = useState("");
-  const [connState, setConnState] = useState("no");
+  // const [connState, setConnState] = useState("no");
   const [inlobby, setInlobby] = useState([]);
   const [ready, setReady] = useState(false);
   const [stateConn, setConn] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [rpeer, setRpeer] = useState("");
+  const [roomConn, setRoomConn] = useState(userStates.NOT_CONNECTED);
 
   useEffect(() => {
     console.log("trying to create lobby");
@@ -55,7 +62,7 @@ function Home(props: any) {
         console.log("connected to lobby");
         const lobby_query = () => {
           lconn.send("QUERY");
-          if (connState === "no") {
+          if (roomConn === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
           window.setTimeout(lobby_query, 1000);
@@ -63,7 +70,7 @@ function Home(props: any) {
         lobby_query();
       });
       lconn.on("data", (data) => {
-        console.log("setting lobby", data);
+        // console.log("setting lobby", data);
         setInlobby(data);
       });
     });
@@ -72,8 +79,15 @@ function Home(props: any) {
       console.log("got connection from", conn.peer);
       if (stateConn == null) {
         setConn(conn);
-        setConnState("playin");
+        // console.log("conn", conn);
+        // setConnState("playin");
+        setRoomConn(userStates.CONNECTED);
         conn.on("data", (data) => {
+          if (data === userStates.NOT_CONNECTED) {
+            console.log("TEB9 POSLALI NAHUI");
+            conn.close();
+            setRoomConn(userStates.NOT_CONNECTED);
+          }
           setMessages((oldArray) => [
             ...oldArray,
             {
@@ -103,7 +117,7 @@ function Home(props: any) {
         return inlobby[Math.floor(Math.random() * inlobby.length)];
       };
 
-      const connect = async () => {
+      const join = async () => {
         console.log(`in lobby now : ${inlobby}`);
         let randomPeer = await getRandomPeer();
         console.log(`random peer ${randomPeer}`);
@@ -117,16 +131,21 @@ function Home(props: any) {
           // await delay(3000);
           // connect();
         }
-        if (randomPeer != peer.id) {
+        if (randomPeer && randomPeer != peer.id) {
           console.log("connect to", randomPeer);
           let newConn = peer.connect(randomPeer);
           // console.log(newConn);
           newConn.on("open", () => {
             console.log("connection open");
             setConn(newConn);
-            setConnState("playin");
+            setRoomConn(userStates.CONNECTED);
           });
           newConn.on("data", (data) => {
+            if (data === userStates.NOT_CONNECTED) {
+              console.log("TEB9 POSLALI NAHUI");
+              newConn.close();
+              setRoomConn(userStates.NOT_CONNECTED);
+            }
             console.log("Received back", data);
             setMessages((oldArray) => [
               ...oldArray,
@@ -138,19 +157,14 @@ function Home(props: any) {
             ]);
           });
           setReady(false);
+          // setRoomConn(userStates.CONNECTED);
         }
       };
-      connect();
+      join();
     } else {
-      console.log("A VSE");
+      // console.log("A VSE");
     }
   }, [inlobby]);
-
-  //test
-  function handleChange(event) {
-    setRpeer(event.target.value);
-    console.log(event.target.value);
-  }
 
   function sendMessage() {
     if (stateConn) {
@@ -167,20 +181,45 @@ function Home(props: any) {
       console.log("no con?");
     }
   }
-  function join() {
-    setReady(!ready);
+  function connect() {
+    console.log("CONN STATE", stateConn);
+    setReady(true);
+    setRoomConn(userStates.CONNECTING);
+  }
+
+  function disconnect() {
+    setReady(false);
+    if (stateConn) {
+      // change to user disconnected
+      stateConn.send(userStates.NOT_CONNECTED);
+      console.log("sended je");
+    } else {
+      console.log("no con?");
+    }
+    // stateConn.close();
+    setRoomConn(userStates.NOT_CONNECTED);
+    console.log("DISC STATE", stateConn);
   }
   return (
     <div>
       {inlobby.map((item, i) => (
         <li key={i}>{item}</li>
       ))}
-      <button onClick={join}>join</button>
+
+      {roomConn === userStates.NOT_CONNECTED && (
+        <button onClick={connect}>Connect</button>
+      )}
+
+      {roomConn === userStates.CONNECTING && <div>CONNECT LOADER</div>}
+
+      {roomConn === userStates.CONNECTED && (
+        <button onClick={disconnect}>Disconnect</button>
+      )}
+
       <br />
       <div>
         <h1>this is my peer{peer.id}</h1>
       </div>
-      <input type="text" value={rpeer} onChange={handleChange} />
       <br />
       <div className="chatbox">
         <MessageList
