@@ -99,6 +99,8 @@ function Home(props: any) {
     return inlobby[Math.floor(Math.random() * inlobby.length)];
   }
 
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
   async function connect() {
     console.log(`in lobby now : ${inlobby}`);
     let randomPeer = await getRandomPeer();
@@ -110,7 +112,8 @@ function Home(props: any) {
       console.log("ONI RAVNI");
       console.log(stateConn);
       // setConn(null);
-      // setInterval(() => connect(), 3000);
+      await delay(3000);
+      connect();
     }
     if (randomPeer != peer.id) {
       console.log("connect to", randomPeer);
