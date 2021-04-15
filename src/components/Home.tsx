@@ -95,48 +95,56 @@ function Home(props: any) {
     setMessage(event.target.value);
   }
 
-  function getRandomPeer() {
-    return inlobby[Math.floor(Math.random() * inlobby.length)];
-  }
+  // const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+  useEffect(() => {
+    if (ready) {
+      const getRandomPeer = () => {
+        return inlobby[Math.floor(Math.random() * inlobby.length)];
+      };
 
-  async function connect() {
-    console.log(`in lobby now : ${inlobby}`);
-    let randomPeer = await getRandomPeer();
-    console.log(`random peer ${randomPeer}`);
-    if (!randomPeer) {
-      console.log("undf peer");
-    }
-    if (randomPeer === peer.id) {
-      console.log("ONI RAVNI");
-      console.log(stateConn);
-      // setConn(null);
-      await delay(3000);
+      const connect = async () => {
+        console.log(`in lobby now : ${inlobby}`);
+        let randomPeer = await getRandomPeer();
+        console.log(`random peer ${randomPeer}`);
+        if (!randomPeer) {
+          console.log("undf peer");
+        }
+        if (randomPeer === peer.id) {
+          console.log("ONI RAVNI");
+          // console.log(stateConn);
+          // setConn(null);
+          // await delay(3000);
+          // connect();
+        }
+        if (randomPeer != peer.id) {
+          console.log("connect to", randomPeer);
+          let newConn = peer.connect(randomPeer);
+          // console.log(newConn);
+          newConn.on("open", () => {
+            console.log("connection open");
+            setConn(newConn);
+            setConnState("playin");
+          });
+          newConn.on("data", (data) => {
+            console.log("Received back", data);
+            setMessages((oldArray) => [
+              ...oldArray,
+              {
+                position: "left",
+                type: "text",
+                text: data,
+              },
+            ]);
+          });
+          setReady(false);
+        }
+      };
       connect();
+    } else {
+      console.log("A VSE");
     }
-    if (randomPeer != peer.id) {
-      console.log("connect to", randomPeer);
-      let newConn = peer.connect(randomPeer);
-      // console.log(newConn);
-      newConn.on("open", () => {
-        console.log("connection open");
-        setConn(newConn);
-        setConnState("playin");
-      });
-      newConn.on("data", (data) => {
-        console.log("Received back", data);
-        setMessages((oldArray) => [
-          ...oldArray,
-          {
-            position: "left",
-            type: "text",
-            text: data,
-          },
-        ]);
-      });
-    }
-  }
+  }, [inlobby]);
 
   //test
   function handleChange(event) {
@@ -159,13 +167,15 @@ function Home(props: any) {
       console.log("no con?");
     }
   }
-
+  function join() {
+    setReady(!ready);
+  }
   return (
     <div>
       {inlobby.map((item, i) => (
         <li key={i}>{item}</li>
       ))}
-      <button onClick={connect}>join</button>
+      <button onClick={join}>join</button>
       <br />
       <div>
         <h1>this is my peer{peer.id}</h1>
