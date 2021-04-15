@@ -2,7 +2,7 @@
   "name": "gnility",
   "version": "1.0.0",
   "scripts": {
-    "start": "node server.ts",
+    "start": "node server.ts -p $PORT",
     "build": "webpack --config webpack.config.ts",
     "watch": "webpack --watch"
   },
