@@ -56,7 +56,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 1000);
+          window.setTimeout(lobby_query, 100);
         };
         lobby_query();
       });
@@ -176,7 +176,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       console.log("no con?");
     }
     // stateConn.close();
-    this.setState({ connState: userStates.NOT_CONNECTED });
+    this.setState({ conn: undefined, connState: userStates.NOT_CONNECTED });
     // console.log("DISC STATE", stateConn);
   }
 
@@ -268,11 +268,11 @@ class Main extends React.Component {
     function expire() {
       for (var k in peers) {
         var now = new Date().getTime();
-        if (now - peers[k] > 3000) {
+        if (now - peers[k] > 1000) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 1000);
+      window.setTimeout(expire, 100);
     }
     expire();
   }
