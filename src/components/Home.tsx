@@ -47,33 +47,13 @@ function Home(props: any) {
     function expire() {
       for (let k in peers) {
         let now = new Date().getTime();
-        if (now - peers[k] > 1000) {
+        if (now - peers[k] > 3000) {
           delete peers[k];
         }
       }
       window.setTimeout(expire, 1000);
     }
     expire();
-
-    peer.on("open", (id) => {
-      setPeer_id(id);
-      const lconn = peer.connect(LOBBY_NAME);
-      lconn.on("open", () => {
-        console.log("connected to lobby");
-        const lobby_query = () => {
-          lconn.send("QUERY");
-          if (roomConn === userStates.NOT_CONNECTED) {
-            lconn.send("READY");
-          }
-          window.setTimeout(lobby_query, 1000);
-        };
-        lobby_query();
-      });
-      lconn.on("data", (data) => {
-        // console.log("setting lobby", data);
-        setInlobby(data);
-      });
-    });
 
     peer.on("connection", (conn) => {
       console.log("got connection from", conn.peer);
@@ -112,6 +92,33 @@ function Home(props: any) {
   // const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   useEffect(() => {
+    // console.log("TUT PIZDA", roomConn)
+    peer.on("open", (id) => {
+      setPeer_id(id);
+      const lconn = peer.connect(LOBBY_NAME);
+      lconn.on("open", () => {
+        console.log("connected to lobby");
+        console.log("status before", roomConn);
+        var lobby_query = () => {
+          // not getting new roomconn state here
+          console.log("status after", roomConn);
+          lconn.send("QUERY");
+          if (roomConn === userStates.NOT_CONNECTED) {
+            lconn.send("READY");
+          }
+          if (roomConn != userStates.NOT_CONNECTED) {
+            lconn.send("STEPANGT");
+          }
+          window.setTimeout(lobby_query, 1000);
+        };
+        lobby_query();
+      });
+      lconn.on("data", (data) => {
+        // console.log("setting lobby", data);
+        setInlobby(data);
+      });
+    });
+
     if (ready) {
       const getRandomPeer = () => {
         return inlobby[Math.floor(Math.random() * inlobby.length)];
@@ -157,7 +164,7 @@ function Home(props: any) {
             ]);
           });
           setReady(false);
-          // setRoomConn(userStates.CONNECTED);
+          setRoomConn(userStates.CONNECTED);
         }
       };
       join();
@@ -182,9 +189,9 @@ function Home(props: any) {
     }
   }
   function connect() {
-    console.log("CONN STATE", stateConn);
-    setReady(true);
+    console.log("ROOM STATE", roomConn);
     setRoomConn(userStates.CONNECTING);
+    setReady(true);
   }
 
   function disconnect() {
@@ -218,7 +225,7 @@ function Home(props: any) {
 
       <br />
       <div>
-        <h1>this is my peer{peer.id}</h1>
+        <h1>this is my peer {peer.id}</h1>
       </div>
       <br />
       <div className="chatbox">
