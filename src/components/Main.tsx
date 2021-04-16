@@ -73,8 +73,12 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           console.log("Received", data);
           if (data === userStates.NOT_CONNECTED) {
             console.log("TEB9 POSLALI NAHUI");
-            conn.close();
-            this.setState({ connState: userStates.NOT_CONNECTED });
+            // conn.close();
+            // console.log("NEW CONN", conn);
+            this.setState({
+              conn: undefined,
+              connState: userStates.NOT_CONNECTED,
+            });
           }
           this.setState((prevState) => ({
             messages: [
@@ -99,15 +103,17 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     console.log("connect to", rp);
     const conn = this.state.peer.connect(rp);
     conn.on("open", () => {
+      // console.log("TRYING NEW CONNECTION", conn);
       console.log("connection open");
       this.setState({ conn: conn, connState: userStates.CONNECTED });
     });
     conn.on("data", (data) => {
       console.log("Received back", data);
+      console.log("disconnect", data);
       if (data === userStates.NOT_CONNECTED) {
         console.log("TEB9 POSLALI NAHUI");
-        conn.close();
         this.setState({
+          conn: undefined,
           connState: userStates.NOT_CONNECTED,
         });
       }
