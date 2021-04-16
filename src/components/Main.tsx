@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import Peer from "peerjs";
 import "../assets/styles/main.css";
 import { Input } from "react-chat-elements";
@@ -26,6 +25,8 @@ type MyState = {
   messages: any;
   rpeer: any;
 };
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 class ChatRoom extends React.Component<MyProps, MyState> {
   constructor(props) {
@@ -98,36 +99,48 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     });
   }
 
+  async join() {
+    const rp = this.state.inlobby[
+      Math.floor(Math.random() * this.state.inlobby.length)
+    ];
+    if (rp && rp != this.state.peer_id) {
+      console.log("connect to", rp);
+      const conn = this.state.peer.connect(rp);
+      conn.on("open", () => {
+        // console.log("TRYING NEW CONNECTION", conn);
+        console.log("connection open");
+        this.setState({ conn: conn, connState: userStates.CONNECTED });
+      });
+      conn.on("data", (data) => {
+        console.log("Received back", data);
+        console.log("disconnect", data);
+        if (data === userStates.NOT_CONNECTED) {
+          console.log("TEB9 POSLALI NAHUI");
+          this.setState({
+            conn: undefined,
+            connState: userStates.NOT_CONNECTED,
+          });
+        }
+        this.setState((prevState) => ({
+          messages: [
+            ...prevState.messages,
+            {
+              position: "left",
+              type: "text",
+              text: data,
+            },
+          ],
+        }));
+      });
+    } else {
+      await delay(3000);
+      this.join();
+    }
+  }
+
   connect() {
-    const rp = this.state.rpeer;
-    console.log("connect to", rp);
-    const conn = this.state.peer.connect(rp);
-    conn.on("open", () => {
-      // console.log("TRYING NEW CONNECTION", conn);
-      console.log("connection open");
-      this.setState({ conn: conn, connState: userStates.CONNECTED });
-    });
-    conn.on("data", (data) => {
-      console.log("Received back", data);
-      console.log("disconnect", data);
-      if (data === userStates.NOT_CONNECTED) {
-        console.log("TEB9 POSLALI NAHUI");
-        this.setState({
-          conn: undefined,
-          connState: userStates.NOT_CONNECTED,
-        });
-      }
-      this.setState((prevState) => ({
-        messages: [
-          ...prevState.messages,
-          {
-            position: "left",
-            type: "text",
-            text: data,
-          },
-        ],
-      }));
-    });
+    this.setState({ connState: userStates.CONNECTING });
+    this.join();
   }
 
   handleChange(event) {
@@ -172,18 +185,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
   }
 
   render() {
-    // const winner = calculateWinner(this.state.squares);
     let connstatus = this.state.connState;
-    // let status;
-    // if (winner != null) {
-    //   if (winner === "draw") {
-    //     status = "Game is a draw";
-    //   } else {
-    //     status = "Winner: " + winner;
-    //   }
-    // } else {
-    //   status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-    // }
 
     return (
       <div>
