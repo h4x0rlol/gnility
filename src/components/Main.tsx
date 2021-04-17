@@ -1,9 +1,6 @@
 import React from "react";
 import Peer from "peerjs";
 import "../assets/styles/styles.min.css";
-// import { Input } from "react-chat-elements";
-// import { Button } from "react-chat-elements";
-// import { MessageList } from "react-chat-elements";
 import {
   MainContainer,
   ChatContainer,
@@ -12,12 +9,10 @@ import {
   MessageInput,
 } from "@chatscope/chat-ui-kit-react";
 
-// import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-
 const LOBBY_NAME = "gnility";
 
 const userStates = {
-  NOT_CONNECTED: "not_connected",
+  NOT_CONNECTED: "User disconnected",
   CONNECTING: "connecting",
   CONNECTED: "connected",
 };
@@ -70,7 +65,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         lobby_query();
       });
       lconn.on("data", (data) => {
-        console.log("setting lobby", data);
+        // console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -178,15 +173,12 @@ class ChatRoom extends React.Component<MyProps, MyState> {
 
   disconnect() {
     if (this.state.conn) {
-      // change to user disconnected
       this.state.conn.send(userStates.NOT_CONNECTED);
       console.log("sended je");
     } else {
       console.log("no con?");
     }
-    // stateConn.close();
     this.setState({ conn: undefined, connState: userStates.NOT_CONNECTED });
-    // console.log("DISC STATE", stateConn);
   }
 
   handleMessage(value) {
