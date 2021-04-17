@@ -11,7 +11,6 @@ import {
   Message,
   MessageInput,
 } from "@chatscope/chat-ui-kit-react";
-import { ThumbDownSharp } from "@material-ui/icons";
 
 // import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 
@@ -66,12 +65,12 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 100);
+          window.setTimeout(lobby_query, 10);
         };
         lobby_query();
       });
       lconn.on("data", (data) => {
-        // console.log("setting lobby", data);
+        console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -276,7 +275,7 @@ class Main extends React.Component {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 100);
+      window.setTimeout(expire, 10);
     }
     expire();
   }
