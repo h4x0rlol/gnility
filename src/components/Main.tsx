@@ -65,7 +65,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         lobby_query();
       });
       lconn.on("data", (data) => {
-        // console.log("setting lobby", data);
+        console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
