@@ -1,9 +1,19 @@
 import React from "react";
 import Peer from "peerjs";
-import "../assets/styles/main.css";
-import { Input } from "react-chat-elements";
-import { Button } from "react-chat-elements";
-import { MessageList } from "react-chat-elements";
+import "../assets/styles/styles.min.css";
+// import { Input } from "react-chat-elements";
+// import { Button } from "react-chat-elements";
+// import { MessageList } from "react-chat-elements";
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList,
+  Message,
+  MessageInput,
+} from "@chatscope/chat-ui-kit-react";
+import { ThumbDownSharp } from "@material-ui/icons";
+
+// import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 
 const LOBBY_NAME = "gnility";
 
@@ -61,7 +71,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         lobby_query();
       });
       lconn.on("data", (data) => {
-        console.log("setting lobby", data);
+        // console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -85,9 +95,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
             messages: [
               ...prevState.messages,
               {
-                position: "left",
-                type: "text",
-                text: data,
+                message: data,
+                sentTime: "just now",
+                direction: "incoming",
               },
             ],
           }));
@@ -113,7 +123,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       });
       conn.on("data", (data) => {
         console.log("Received back", data);
-        console.log("disconnect", data);
+        // console.log("disconnect", data);
         if (data === userStates.NOT_CONNECTED) {
           console.log("TEB9 POSLALI NAHUI");
           this.setState({
@@ -125,9 +135,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           messages: [
             ...prevState.messages,
             {
-              position: "left",
-              type: "text",
-              text: data,
+              message: data,
+              sentTime: "just now",
+              direction: "incoming",
             },
           ],
         }));
@@ -156,9 +166,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         messages: [
           ...prevState.messages,
           {
-            position: "right",
-            type: "text",
-            text: this.state.message,
+            message: this.state.message,
+            sentTime: "just now",
+            direction: "outgoing",
           },
         ],
       }));
@@ -180,8 +190,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     // console.log("DISC STATE", stateConn);
   }
 
-  handleMessage(event) {
-    this.setState({ message: event.target.value });
+  handleMessage(value) {
+    this.setState({ message: value });
   }
 
   render() {
@@ -211,30 +221,24 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           <h1>this is my peer {this.state.peer.id}</h1>
         </div>
         <br />
-        <input type="text" onChange={this.handleChange} />
-        <br />
-        <div className="chatbox">
-          <MessageList
-            className="message-list"
-            lockable={true}
-            toBottomHeight={"100%"}
-            dataSource={this.state.messages}
-          />
 
-          <Input
-            placeholder="Type here..."
-            multiline={true}
-            defaultValue={this.state.message}
-            onChange={this.handleMessage}
-            rightButtons={
-              <Button
-                color="white"
-                backgroundColor="black"
-                text="Send"
-                onClick={this.sendMessage}
+        <div style={{ position: "relative", height: "500px" }}>
+          <MainContainer>
+            <ChatContainer>
+              <MessageList autoScrollToBottom={true}>
+                {this.state.messages.map((item, index) => (
+                  <Message model={item} key={index} />
+                ))}
+              </MessageList>
+              <MessageInput
+                placeholder="Type message here"
+                attachButton={false}
+                value={this.state.message}
+                onChange={this.handleMessage}
+                onSend={this.sendMessage}
               />
-            }
-          />
+            </ChatContainer>
+          </MainContainer>
         </div>
       </div>
     );
