@@ -48,11 +48,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.state = {
-      peer: new Peer({
-        secure: true,
-        host: "gnility-server.herokuapp.com",
-        port: 443,
-      }),
+      peer: new Peer(),
       peer_id: null,
       conn: null,
       connState: userStates.NOT_CONNECTED,
@@ -71,7 +67,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 10);
+          window.setTimeout(lobby_query, 1000);
         };
         lobby_query();
       });
@@ -254,11 +250,7 @@ class Main extends React.Component {
     let peers = {};
 
     // this may fail unless you are the first player
-    const lobby = new Peer(LOBBY_NAME, {
-      secure: true,
-      host: "gnility-server.herokuapp.com",
-      port: 443,
-    });
+    const lobby = new Peer(LOBBY_NAME);
     lobby.on("open", function (id) {
       console.log("Lobby peer ID is: " + id);
     });
@@ -278,11 +270,11 @@ class Main extends React.Component {
     function expire() {
       for (var k in peers) {
         var now = new Date().getTime();
-        if (now - peers[k] > 1000) {
+        if (now - peers[k] > 3000) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 10);
+      window.setTimeout(expire, 1000);
     }
     expire();
   }
