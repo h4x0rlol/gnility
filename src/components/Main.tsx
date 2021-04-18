@@ -48,7 +48,11 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.state = {
-      peer: new Peer(),
+      peer: new Peer({
+        secure: true,
+        host: "gnility-server.herokuapp.com",
+        port: 443,
+      }),
       peer_id: null,
       conn: null,
       connState: userStates.NOT_CONNECTED,
@@ -250,7 +254,11 @@ class Main extends React.Component {
     let peers = {};
 
     // this may fail unless you are the first player
-    const lobby = new Peer(LOBBY_NAME);
+    const lobby = new Peer(LOBBY_NAME, {
+      secure: true,
+      host: "gnility-server.herokuapp.com",
+      port: 443,
+    });
     lobby.on("open", function (id) {
       console.log("Lobby peer ID is: " + id);
     });
