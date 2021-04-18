@@ -16,7 +16,7 @@ import {
   TYPING STATE (separate component visible when data of typing is sended)
   ne ubirat chela kogda u nego status connecting, a prover9t pir, udal99 ego iz massiva
 */
-const LOBBY_NAME = "gnility1";
+const LOBBY_NAME = "gnility";
 
 const userStates = {
   NOT_CONNECTED: "User disconnected",
@@ -39,8 +39,6 @@ type MyState = {
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-let peers = {};
-
 class ChatRoom extends React.Component<MyProps, MyState> {
   constructor(props) {
     super(props);
@@ -62,10 +60,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
       const lconn = this.state.peer.connect(LOBBY_NAME);
-      console.log("here before connection", this.state.inlobby);
-      console.log(lconn);
       lconn.on("open", () => {
-        console.log("here after connection", this.state.inlobby);
+        console.log("connected to lobby");
         const lobby_query = () => {
           lconn.send("QUERY");
           if (this.state.connState === userStates.NOT_CONNECTED) {
@@ -111,22 +107,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         console.log("already connected");
         conn.close();
       }
-    });
-    const lobby = new Peer(LOBBY_NAME);
-    lobby.on("open", function (id) {
-      console.log("Lobby peer ID is: " + id);
-    });
-
-    lobby.on("connection", (conn) => {
-      console.log("lobby connection", conn.peer);
-      conn.on("data", (data) => {
-        if (data === "READY") {
-          peers[conn.peer] = new Date().getTime();
-        }
-        if (data === "QUERY") {
-          conn.send(Object.keys(peers));
-        }
-      });
     });
   }
 
@@ -267,25 +247,25 @@ class Main extends React.Component {
   componentDidMount() {
     console.log("trying to create lobby");
 
-    // let peers = {};
+    let peers = {};
 
     // this may fail unless you are the first player
-    // const lobby = new Peer(LOBBY_NAME);
-    // lobby.on("open", function (id) {
-    //   console.log("Lobby peer ID is: " + id);
-    // });
+    const lobby = new Peer(LOBBY_NAME);
+    lobby.on("open", function (id) {
+      console.log("Lobby peer ID is: " + id);
+    });
 
-    // lobby.on("connection", (conn) => {
-    //   console.log("lobby connection", conn.peer);
-    //   conn.on("data", (data) => {
-    //     if (data === "READY") {
-    //       peers[conn.peer] = new Date().getTime();
-    //     }
-    //     if (data === "QUERY") {
-    //       conn.send(Object.keys(peers));
-    //     }
-    //   });
-    // });
+    lobby.on("connection", (conn) => {
+      console.log("lobby connection", conn.peer);
+      conn.on("data", (data) => {
+        if (data === "READY") {
+          peers[conn.peer] = new Date().getTime();
+        }
+        if (data === "QUERY") {
+          conn.send(Object.keys(peers));
+        }
+      });
+    });
 
     function expire() {
       for (var k in peers) {
