@@ -67,7 +67,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 1000);
+          window.setTimeout(lobby_query, 10);
         };
         lobby_query();
       });
@@ -270,11 +270,11 @@ class Main extends React.Component {
     function expire() {
       for (var k in peers) {
         var now = new Date().getTime();
-        if (now - peers[k] > 3000) {
+        if (now - peers[k] > 1000) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 1000);
+      window.setTimeout(expire, 10);
     }
     expire();
   }
