@@ -9,6 +9,13 @@ import {
   MessageInput,
 } from "@chatscope/chat-ui-kit-react";
 
+/* 
+  TODO
+
+  CLEAR INPUT
+  TYPING STATE (separate component visible when data of typing is sended)
+  ne ubirat chela kogda u nego status connecting, a prover9t pir, udal99 ego iz massiva
+*/
 const LOBBY_NAME = "gnility";
 
 const userStates = {
@@ -60,7 +67,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 10);
+          window.setTimeout(lobby_query, 1000);
         };
         lobby_query();
       });
@@ -263,11 +270,11 @@ class Main extends React.Component {
     function expire() {
       for (var k in peers) {
         var now = new Date().getTime();
-        if (now - peers[k] > 1000) {
+        if (now - peers[k] > 3000) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 10);
+      window.setTimeout(expire, 1000);
     }
     expire();
   }
