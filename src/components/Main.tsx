@@ -60,8 +60,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
       const lconn = this.state.peer.connect(LOBBY_NAME);
+      console.log("here before connection", this.state.inlobby);
       lconn.on("open", () => {
-        console.log("connected to lobby");
+        console.log("here after connection", this.state.inlobby);
         const lobby_query = () => {
           lconn.send("QUERY");
           if (this.state.connState === userStates.NOT_CONNECTED) {
