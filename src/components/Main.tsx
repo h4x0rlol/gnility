@@ -7,6 +7,7 @@ import {
   MessageList,
   Message,
   MessageInput,
+  TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 
 /* 
@@ -22,6 +23,7 @@ const userStates = {
   NOT_CONNECTED: "User disconnected",
   CONNECTING: "connecting",
   CONNECTED: "connected",
+  TYPING: "typingQXSQ$!",
 };
 
 type MyProps = {};
@@ -35,6 +37,7 @@ type MyState = {
   message: any;
   messages: any;
   rpeer: any;
+  typing: any;
 };
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -56,6 +59,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       message: "",
       messages: [],
       rpeer: "",
+      typing: false,
     };
     this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
@@ -92,16 +96,23 @@ class ChatRoom extends React.Component<MyProps, MyState> {
               connState: userStates.NOT_CONNECTED,
             });
           }
-          this.setState((prevState) => ({
-            messages: [
-              ...prevState.messages,
-              {
-                message: data,
-                sentTime: "just now",
-                direction: "incoming",
-              },
-            ],
-          }));
+          if (data === userStates.TYPING) {
+            this.setState({
+              typing: true,
+            });
+          }
+          if (data != userStates.TYPING) {
+            this.setState({typing:false})
+            this.setState((prevState) => ({
+              messages: [
+                ...prevState.messages,
+                {
+                  message: data,
+                  sentTime: "just now",
+                  direction: "incoming",
+                },
+              ],
+            })}
         });
       } else {
         console.log("already connected");
@@ -132,16 +143,24 @@ class ChatRoom extends React.Component<MyProps, MyState> {
             connState: userStates.NOT_CONNECTED,
           });
         }
-        this.setState((prevState) => ({
-          messages: [
-            ...prevState.messages,
-            {
-              message: data,
-              sentTime: "just now",
-              direction: "incoming",
-            },
-          ],
-        }));
+        if (data === userStates.TYPING) {
+          this.setState({
+            typing: true,
+          });
+        }
+        if (data != userStates.TYPING) {
+          this.setState({typing:false})
+          this.setState((prevState) => ({
+            messages: [
+              ...prevState.messages,
+              {
+                message: data,
+                sentTime: "just now",
+                direction: "incoming",
+              },
+            ],
+          }));
+        }
       });
     } else {
       await delay(3000);
@@ -173,6 +192,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           },
         ],
       }));
+      this.setState({ message: "" });
+      this.setState({ typing: false });
     } else {
       console.log("no con?");
     }
@@ -189,6 +210,11 @@ class ChatRoom extends React.Component<MyProps, MyState> {
   }
 
   handleMessage(value) {
+    if (this.state.conn) {
+      this.state.conn.send(userStates.TYPING);
+    } else {
+      console.log("no con?");
+    }
     this.setState({ message: value });
   }
 
@@ -227,6 +253,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
                 {this.state.messages.map((item, index) => (
                   <Message model={item} key={index} />
                 ))}
+                {this.state.typing && (
+                  <TypingIndicator content="User is typing" />
+                )}
               </MessageList>
               <MessageInput
                 placeholder="Type message here"
