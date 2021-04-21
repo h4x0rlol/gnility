@@ -102,7 +102,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
             });
           }
           if (data != userStates.TYPING) {
-            this.setState({typing:false})
+            this.setState({ typing: false });
             this.setState((prevState) => ({
               messages: [
                 ...prevState.messages,
@@ -112,7 +112,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
                   direction: "incoming",
                 },
               ],
-            })}
+            }));
+          }
         });
       } else {
         console.log("already connected");
@@ -149,7 +150,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           });
         }
         if (data != userStates.TYPING) {
-          this.setState({typing:false})
+          this.setState({ typing: false });
           this.setState((prevState) => ({
             messages: [
               ...prevState.messages,
