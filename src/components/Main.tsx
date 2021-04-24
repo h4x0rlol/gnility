@@ -8,22 +8,21 @@ import {
   Message,
   MessageInput,
   TypingIndicator,
+  Status,
 } from "@chatscope/chat-ui-kit-react";
 
 /* 
   TODO
-
-  CLEAR INPUT
-  TYPING STATE (separate component visible when data of typing is sended)
-  ne ubirat chela kogda u nego status connecting, a prover9t pir, udal99 ego iz massiva
+  // indicator
 */
 const LOBBY_NAME = "gnility";
 
+// Just random strings
 const userStates = {
-  NOT_CONNECTED: "User disconnected",
-  CONNECTING: "connecting",
-  CONNECTED: "connected",
-  TYPING: "typingQXSQ$!",
+  NOT_CONNECTED: "2356694745",
+  CONNECTING: "8784071616",
+  CONNECTED: "5572253747",
+  TYPING: "6728562522",
 };
 
 type MyProps = {};
@@ -95,13 +94,11 @@ class ChatRoom extends React.Component<MyProps, MyState> {
               conn: undefined,
               connState: userStates.NOT_CONNECTED,
             });
-          }
-          if (data === userStates.TYPING) {
+          } else if (data === userStates.TYPING) {
             this.setState({
               typing: true,
             });
-          }
-          if (data != userStates.TYPING) {
+          } else {
             this.setState({ typing: false });
             this.setState((prevState) => ({
               messages: [
@@ -143,13 +140,11 @@ class ChatRoom extends React.Component<MyProps, MyState> {
             conn: undefined,
             connState: userStates.NOT_CONNECTED,
           });
-        }
-        if (data === userStates.TYPING) {
+        } else if (data === userStates.TYPING) {
           this.setState({
             typing: true,
           });
-        }
-        if (data != userStates.TYPING) {
+        } else {
           this.setState({ typing: false });
           this.setState((prevState) => ({
             messages: [
@@ -251,6 +246,26 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           <MainContainer>
             <ChatContainer>
               <MessageList autoScrollToBottom={true}>
+                {this.state.conn ? (
+                  <Status
+                    status="available"
+                    size="xs"
+                    name="User is connected"
+                    style={{
+                      marginBottom: "0.5em",
+                    }}
+                  />
+                ) : (
+                  <Status
+                    status="unavailable"
+                    size="xs"
+                    name="User is disconnected"
+                    style={{
+                      marginBottom: "0.5em",
+                    }}
+                  />
+                )}
+
                 {this.state.messages.map((item, index) => (
                   <Message model={item} key={index} />
                 ))}
