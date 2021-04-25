@@ -12,8 +12,10 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 
 /* 
-  TODO
-  // indicator
+  Nicknames
+  THEMES
+  UI
+
 */
 const LOBBY_NAME = "gnility";
 
@@ -60,6 +62,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       rpeer: "",
       typing: false,
     };
+
     this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
       const lconn = this.state.peer.connect(LOBBY_NAME);
@@ -302,7 +305,6 @@ class Main extends React.Component {
 
     let peers = {};
 
-    // this may fail unless you are the first player
     const lobby = new Peer(LOBBY_NAME);
     lobby.on("open", (id) => {
       console.log("Lobby peer ID is: " + id);
@@ -321,8 +323,8 @@ class Main extends React.Component {
     });
 
     function expire() {
-      for (var k in peers) {
-        var now = new Date().getTime();
+      for (let k in peers) {
+        let now = new Date().getTime();
         if (now - peers[k] > 1500) {
           delete peers[k];
         }
