@@ -124,6 +124,10 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         conn.close();
       }
     });
+    window.addEventListener("beforeunload", (ev) => {
+      ev.preventDefault();
+      this.disconnect();
+    });
   }
 
   async join() {
