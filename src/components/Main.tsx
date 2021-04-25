@@ -70,7 +70,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 10);
+          window.setTimeout(lobby_query, 100);
         };
         lobby_query();
       });
@@ -83,6 +83,10 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.state.peer.on("connection", (conn) => {
       console.log("got connection from", conn.peer);
       if (this.state.conn == null) {
+        const index = this.state.inlobby.indexOf(this.state.peer_id);
+        this.setState({
+          inlobby: this.state.inlobby.filter((_, i) => i !== index),
+        });
         this.setState({ conn: conn, connState: userStates.CONNECTED });
         conn.on("data", (data) => {
           console.log("Received", data);
@@ -159,12 +163,16 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         }
       });
     } else {
-      await delay(3000);
+      await delay(1000);
       this.join();
     }
   }
 
   connect() {
+    const index = this.state.inlobby.indexOf(this.state.peer_id);
+    this.setState({
+      inlobby: this.state.inlobby.filter((_, i) => i !== index),
+    });
     this.setState({ connState: userStates.CONNECTING });
     this.join();
   }
@@ -296,7 +304,7 @@ class Main extends React.Component {
 
     // this may fail unless you are the first player
     const lobby = new Peer(LOBBY_NAME);
-    lobby.on("open", function (id) {
+    lobby.on("open", (id) => {
       console.log("Lobby peer ID is: " + id);
     });
 
@@ -315,11 +323,11 @@ class Main extends React.Component {
     function expire() {
       for (var k in peers) {
         var now = new Date().getTime();
-        if (now - peers[k] > 1000) {
+        if (now - peers[k] > 1500) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 10);
+      window.setTimeout(expire, 100);
     }
     expire();
   }
