@@ -26,6 +26,23 @@ const customConfig: Config = {
   style: "capital",
 };
 
+import axios, { AxiosRequestConfig } from "axios";
+
+async function makeRequest() {
+  const config: AxiosRequestConfig = {
+    method: "get",
+    url:
+      "https://en.wikipedia.org/w/api.php?origin=*&action=query&list=random&format=json&rnnamespace=0&rnlimit=1",
+  };
+
+  let res = await axios(config);
+  console.log(res.data.query.random[0].title);
+
+  if (res) {
+    return res.data.query.random[0].title;
+  }
+}
+
 /* TODO
 
   RANDOM THEMES
@@ -42,6 +59,7 @@ const userStates = {
   CONNECTED: "5572253747",
   TYPING: "6728562522",
   USERNAME: "708954385",
+  THEME: "23173173213",
 };
 
 type MyProps = {};
@@ -58,6 +76,7 @@ type MyState = {
   typing: any;
   myname: any;
   rname: any;
+  theme: any;
 };
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -70,6 +89,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.disconnect = this.disconnect.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
+    this.getTheme = this.getTheme.bind(this);
+
     this.state = {
       peer: new Peer(),
       peer_id: undefined,
@@ -82,6 +103,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       typing: false,
       myname: uniqueNamesGenerator(customConfig),
       rname: "",
+      theme: "",
     };
 
     this.state.peer.on("open", (id) => {
@@ -268,6 +290,13 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.setState({ message: value });
   }
 
+  async getTheme() {
+    let theme = await makeRequest();
+    this.setState({
+      theme: theme,
+    });
+  }
+
   render() {
     let connstatus = this.state.connState;
 
@@ -297,8 +326,12 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         <div>
           <h1>this is name {this.state.myname}</h1>
         </div>
+        <div></div>
         <div>
-          <h1>this is remote name {this.state.rname}</h1>
+          <button onClick={this.getTheme}>WIKI</button>
+        </div>
+        <div>
+          <h1>theme is: {this.state.theme}</h1>
         </div>
         <br />
         <div>
