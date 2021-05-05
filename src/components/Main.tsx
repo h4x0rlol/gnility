@@ -26,10 +26,11 @@ const customConfig: Config = {
   style: "capital",
 };
 
-/* 
-  Nicknames
-  THEMES
+/* TODO
+
+  RANDOM THEMES
   UI
+  THEMES
 
 */
 const LOBBY_NAME = "gnility";
@@ -329,7 +330,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
                   <Message model={item} key={index} />
                 ))}
                 {this.state.typing && (
-                  <TypingIndicator content="User is typing" />
+                  <TypingIndicator content={`${this.state.rname} is typing`} />
                 )}
               </MessageList>
               <MessageInput
