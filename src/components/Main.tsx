@@ -11,6 +11,21 @@ import {
   Status,
 } from "@chatscope/chat-ui-kit-react";
 
+import {
+  uniqueNamesGenerator,
+  Config,
+  adjectives,
+  colors,
+  animals,
+} from "unique-names-generator";
+
+const customConfig: Config = {
+  dictionaries: [adjectives, colors, animals],
+  separator: "_",
+  length: 3,
+  style: "capital",
+};
+
 /* 
   Nicknames
   THEMES
@@ -25,6 +40,7 @@ const userStates = {
   CONNECTING: "8784071616",
   CONNECTED: "5572253747",
   TYPING: "6728562522",
+  USERNAME: "708954385",
 };
 
 type MyProps = {};
@@ -39,6 +55,8 @@ type MyState = {
   messages: any;
   rpeer: any;
   typing: any;
+  myname: any;
+  rname: any;
 };
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -53,14 +71,16 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.sendMessage = this.sendMessage.bind(this);
     this.state = {
       peer: new Peer(),
-      peer_id: null,
-      conn: null,
+      peer_id: undefined,
+      conn: undefined,
       connState: userStates.NOT_CONNECTED,
       inlobby: [],
       message: "",
       messages: [],
       rpeer: "",
       typing: false,
+      myname: uniqueNamesGenerator(customConfig),
+      rname: "",
     };
 
     this.state.peer.on("open", (id) => {
@@ -78,7 +98,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         lobby_query();
       });
       lconn.on("data", (data) => {
-        console.log("setting lobby", data);
+        // console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -86,11 +106,13 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.state.peer.on("connection", (conn) => {
       console.log("got connection from", conn.peer);
       if (this.state.conn == null) {
-        const index = this.state.inlobby.indexOf(this.state.peer_id);
-        this.setState({
-          inlobby: this.state.inlobby.filter((_, i) => i !== index),
-        });
         this.setState({ conn: conn, connState: userStates.CONNECTED });
+        conn.on("open", () => {
+          conn.send({
+            id: userStates.USERNAME,
+            name: this.state.myname,
+          });
+        });
         conn.on("data", (data) => {
           console.log("Received", data);
           if (data === userStates.NOT_CONNECTED) {
@@ -100,10 +122,16 @@ class ChatRoom extends React.Component<MyProps, MyState> {
             this.setState({
               conn: undefined,
               connState: userStates.NOT_CONNECTED,
+              rname: "",
             });
           } else if (data === userStates.TYPING) {
             this.setState({
               typing: true,
+            });
+          } else if (data.id === userStates.USERNAME) {
+            // console.log("dated");
+            this.setState({
+              rname: data.name,
             });
           } else {
             this.setState({ typing: false });
@@ -141,6 +169,10 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         // console.log("TRYING NEW CONNECTION", conn);
         console.log("connection open");
         this.setState({ conn: conn, connState: userStates.CONNECTED });
+        conn.send({
+          id: userStates.USERNAME,
+          name: this.state.myname,
+        });
       });
       conn.on("data", (data) => {
         console.log("Received back", data);
@@ -150,10 +182,16 @@ class ChatRoom extends React.Component<MyProps, MyState> {
           this.setState({
             conn: undefined,
             connState: userStates.NOT_CONNECTED,
+            rname: "",
           });
         } else if (data === userStates.TYPING) {
           this.setState({
             typing: true,
+          });
+        } else if (data.id === userStates.USERNAME) {
+          // console.log("dated");
+          this.setState({
+            rname: data.name,
           });
         } else {
           this.setState({ typing: false });
@@ -176,10 +214,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
   }
 
   connect() {
-    const index = this.state.inlobby.indexOf(this.state.peer_id);
-    this.setState({
-      inlobby: this.state.inlobby.filter((_, i) => i !== index),
-    });
     this.setState({ connState: userStates.CONNECTING });
     this.join();
   }
@@ -217,7 +251,11 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     } else {
       console.log("no con?");
     }
-    this.setState({ conn: undefined, connState: userStates.NOT_CONNECTED });
+    this.setState({
+      conn: undefined,
+      connState: userStates.NOT_CONNECTED,
+      rname: "",
+    });
   }
 
   handleMessage(value) {
@@ -255,32 +293,38 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         <div>
           <h1>this is my peer {this.state.peer.id}</h1>
         </div>
+        <div>
+          <h1>this is name {this.state.myname}</h1>
+        </div>
+        <div>
+          <h1>this is remote name {this.state.rname}</h1>
+        </div>
         <br />
-
+        <div>
+          {this.state.conn ? (
+            <Status
+              status="available"
+              size="xs"
+              name="Connected"
+              style={{
+                marginBottom: "0.5em",
+              }}
+            />
+          ) : (
+            <Status
+              status="unavailable"
+              size="xs"
+              name="Disconnected"
+              style={{
+                marginBottom: "0.5em",
+              }}
+            />
+          )}
+        </div>
         <div style={{ position: "relative", height: "500px" }}>
           <MainContainer>
             <ChatContainer>
               <MessageList autoScrollToBottom={true}>
-                {this.state.conn ? (
-                  <Status
-                    status="available"
-                    size="xs"
-                    name="User is connected"
-                    style={{
-                      marginBottom: "0.5em",
-                    }}
-                  />
-                ) : (
-                  <Status
-                    status="unavailable"
-                    size="xs"
-                    name="User is disconnected"
-                    style={{
-                      marginBottom: "0.5em",
-                    }}
-                  />
-                )}
-
                 {this.state.messages.map((item, index) => (
                   <Message model={item} key={index} />
                 ))}
