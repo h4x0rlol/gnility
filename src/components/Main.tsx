@@ -1,6 +1,15 @@
 import React from "react";
 import Peer from "peerjs";
 import "../assets/styles/styles.min.css";
+import { getRandomName } from "../utils/generateRandomName";
+import { makeRequest } from "../utils/getRandomTheme";
+import {
+  delay,
+  MyProps,
+  MyState,
+  userStates,
+  LOBBY_NAME,
+} from "../utils/constants";
 import {
   MainContainer,
   ChatContainer,
@@ -11,75 +20,12 @@ import {
   Status,
 } from "@chatscope/chat-ui-kit-react";
 
-import {
-  uniqueNamesGenerator,
-  Config,
-  adjectives,
-  colors,
-  animals,
-} from "unique-names-generator";
-
-const customConfig: Config = {
-  dictionaries: [adjectives, colors, animals],
-  separator: "_",
-  length: 3,
-  style: "capital",
-};
-
-import axios, { AxiosRequestConfig } from "axios";
-
-async function makeRequest() {
-  const config: AxiosRequestConfig = {
-    method: "get",
-    url:
-      "https://en.wikipedia.org/w/api.php?origin=*&action=query&list=random&format=json&rnnamespace=0&rnlimit=1",
-  };
-
-  let res = await axios(config);
-  console.log(res.data.query.random[0].title);
-
-  if (res) {
-    return res.data.query.random[0].title;
-  }
-}
-
 /* TODO
 
   RANDOM THEMES
   UI
-  THEMES
 
 */
-const LOBBY_NAME = "gnility";
-
-// Just random strings
-const userStates = {
-  NOT_CONNECTED: "2356694745",
-  CONNECTING: "8784071616",
-  CONNECTED: "5572253747",
-  TYPING: "6728562522",
-  USERNAME: "708954385",
-  THEME: "23173173213",
-};
-
-type MyProps = {};
-
-type MyState = {
-  peer: any;
-  peer_id: any;
-  conn: any;
-  connState: any;
-  inlobby: any;
-  message: any;
-  messages: any;
-  rpeer: any;
-  typing: any;
-  myname: any;
-  rname: any;
-  theme: any;
-};
-
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 class ChatRoom extends React.Component<MyProps, MyState> {
   constructor(props) {
@@ -101,7 +47,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       messages: [],
       rpeer: "",
       typing: false,
-      myname: uniqueNamesGenerator(customConfig),
+      myname: getRandomName(),
       rname: "",
       theme: "",
     };
@@ -326,7 +272,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         <div>
           <h1>this is name {this.state.myname}</h1>
         </div>
-        <div></div>
+        <div>
+          <h1>this is rname {this.state.rname}</h1>
+        </div>
         <div>
           <button onClick={this.getTheme}>WIKI</button>
         </div>
