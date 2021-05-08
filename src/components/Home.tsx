@@ -9,18 +9,24 @@ export const Home = () => {
   };
   return (
     <div>
-      <button onClick={handlePress}>press</button>
+      {/* <button onClick={handlePress}>press</button> */}
       {!inSearch ? (
         <div id="home">
           <img id="logo" src="/images/logo.png" alt="logo.png" />
-          <h1 id="home_is">is</h1>
-          <h1 id="home_text">
-            a simple WebRTC peer to peer chat on a random themes
-          </h1>
-          <div id="home_btn"></div>
+          <div id="home_text"></div>
+          <h1>is</h1>
+          <h1>a simple WebRTC peer to peer chat on a random themes</h1>
+          <div id="home_start">
+            <div>
+              <h2>Start chating</h2>
+            </div>
+            <div>
+              <i id="arrow"></i>
+            </div>
+          </div>
           <div id="home_link">
             <h3>Source code available </h3>
-            <a href="https://github.com/h4x0rlol/gnility"> here</a>
+            <a href="https://github.com/h4x0rlol/gnility">here</a>
           </div>
         </div>
       ) : (
