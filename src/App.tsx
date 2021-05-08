@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Home } from "./components/Home";
 import Main from "./components/Main";
 // import { ThemeProvider } from "@material-ui/styles";
 // import theme from "./theme";
@@ -6,7 +7,8 @@ import Main from "./components/Main";
 export default function App() {
   return (
     //   <ThemeProvider theme={theme}>
-    <Main />
+    <Home />
+    // <Main />
     //   </ThemeProvider>
   );
 }

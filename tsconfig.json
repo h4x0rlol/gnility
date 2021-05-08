@@ -4,6 +4,7 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "target": "es5"
+    "target": "es5",
+    "typeRoots": ["node_modules/@types", "src/types"]
   }
 }

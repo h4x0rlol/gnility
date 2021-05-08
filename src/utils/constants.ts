@@ -28,6 +28,7 @@ export type MyState = {
   myname: any;
   rname: any;
   theme: any;
+  lconn: any;
 };
 
 // Delay function

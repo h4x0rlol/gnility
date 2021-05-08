@@ -50,12 +50,14 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       myname: getRandomName(),
       rname: "",
       theme: "",
+      lconn: undefined,
     };
 
     this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
       const lconn = this.state.peer.connect(LOBBY_NAME);
-      lconn.on("open", () => {
+      this.setState({ lconn: lconn });
+      this.state.lconn.on("open", () => {
         console.log("connected to lobby");
         const lobby_query = () => {
           lconn.send("QUERY");
@@ -66,7 +68,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         };
         lobby_query();
       });
-      lconn.on("data", (data) => {
+      this.state.lconn.on("data", (data) => {
         // console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
@@ -243,12 +245,26 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     });
   }
 
-  render() {
-    let connstatus = this.state.connState;
+  componentWillUnmount() {
+    if (this.state.conn) {
+      this.state.conn.send(userStates.NOT_CONNECTED);
+      console.log("sended je");
+    } else {
+      console.log("no con?");
+    }
+    if (this.state.lconn) {
+      this.state.lconn.close();
+    }
 
+    this.setState = (state, callback) => {
+      return;
+    };
+  }
+
+  render() {
     return (
       <div>
-        <div className="connstatus">{connstatus}</div>
+        <div>in lobby now</div>
         {this.state.inlobby.map((item, i) => (
           <li key={i}>{item}</li>
         ))}
@@ -363,6 +379,7 @@ class Main extends React.Component {
     }
     expire();
   }
+
   render() {
     return <ChatRoom />;
   }
