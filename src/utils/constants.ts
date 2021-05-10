@@ -30,7 +30,6 @@ export type MyState = {
   theme: any;
   lconn: any;
   inChat: any;
-  randTheme: any;
   customTheme: any;
 };
 

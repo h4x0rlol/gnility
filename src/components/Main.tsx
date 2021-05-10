@@ -40,7 +40,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.getTheme = this.getTheme.bind(this);
-    this.handleRandomChange = this.handleRandomChange.bind(this);
     this.handleCustomChange = this.handleCustomChange.bind(this);
 
     this.state = {
@@ -58,7 +57,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       theme: "",
       lconn: undefined,
       inChat: false,
-      randTheme: true,
       customTheme: "",
     };
 
@@ -198,10 +196,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.join();
   }
 
-  handleRandomChange() {
-    this.setState({ randTheme: !this.state.randTheme, customTheme: "" });
-  }
-
   handleCustomChange(e) {
     this.setState({ customTheme: e.target.value });
   }
@@ -282,7 +276,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     return (
       <div id="search_room">
         <div id="search_status">
-          <CircularProgress color="secondary" size={15} />
+          <CircularProgress color="secondary" size={20} />
           <p id="search_p">You are in search </p>
         </div>
         <div id="theme">
@@ -301,15 +295,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
               InputProps={{
                 style: { color: "#ADD8E6" },
               }}
-              disabled={this.state.randTheme}
-            />
-          </div>
-          <div id="theme_checkbox">
-            <p>Random theme</p>
-            <Checkbox
-              checked={this.state.randTheme}
-              onChange={this.handleRandomChange}
-              inputProps={{ "aria-label": "primary checkbox" }}
             />
           </div>
         </div>

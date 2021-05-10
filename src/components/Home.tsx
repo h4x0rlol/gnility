@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../assets/styles/home.css";
 import Main from "./Main";
 
+// MOVE NAME GENERATION HERE
 export const Home = () => {
   const [inSearch, setInSearch] = useState(true);
 

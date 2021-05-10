@@ -1,7 +1,7 @@
 #search_room {
   display: flex;
-  margin-top: 30px;
-  font-size: 20px;
+  margin-top: 200px;
+  font-size: 25px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -17,12 +17,4 @@
 
 #search_p {
   margin-left: 10px;
-}
-
-#theme_checkbox {
-  display: flex;
-  justify-self: center;
-  flex-direction: row;
-  align-items: center;
-  margin-left: 30%;
 }
