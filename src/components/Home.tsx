@@ -1,27 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "../assets/styles/home.css";
 import Main from "./Main";
-import scrollIntoView from "scroll-into-view-if-needed";
 
 export const Home = () => {
-  const [inSearch, setInSearch] = useState(false);
-  const [lobby, setLobby] = useState(null);
-  useEffect(() => {
-    const node = document.getElementById("lobby");
-    setLobby(node);
-  }, []);
+  const [inSearch, setInSearch] = useState(true);
 
   const handlePress = () => {
     setInSearch(!inSearch);
-    console.log(lobby);
-    if (lobby) {
-      scrollIntoView(lobby, {
-        block: "center",
-        inline: "center",
-        behavior: "smooth",
-      });
-    }
   };
+
   return (
     <div>
       {!inSearch ? (
@@ -44,7 +31,10 @@ export const Home = () => {
           </div>
         </div>
       ) : (
-        <Main />
+        <div id="lobby">
+          <i id="back_arrow" onClick={handlePress}></i>
+          <Main />
+        </div>
       )}
     </div>
   );

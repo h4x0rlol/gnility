@@ -1,6 +1,10 @@
 import React from "react";
 import Peer from "peerjs";
 import "../assets/styles/styles.min.css";
+import "../assets/styles/custom.css";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import TextField from "@material-ui/core/TextField";
+import Checkbox from "@material-ui/core/Checkbox";
 import { getRandomName } from "../utils/generateRandomName";
 import { makeRequest } from "../utils/getRandomTheme";
 import {
@@ -36,6 +40,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
     this.getTheme = this.getTheme.bind(this);
+    this.handleRandomChange = this.handleRandomChange.bind(this);
+    this.handleCustomChange = this.handleCustomChange.bind(this);
 
     this.state = {
       peer: new Peer(),
@@ -51,6 +57,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       rname: "",
       theme: "",
       lconn: undefined,
+      inChat: false,
+      randTheme: true,
+      customTheme: "",
     };
 
     this.state.peer.on("open", (id) => {
@@ -189,6 +198,14 @@ class ChatRoom extends React.Component<MyProps, MyState> {
     this.join();
   }
 
+  handleRandomChange() {
+    this.setState({ randTheme: !this.state.randTheme, customTheme: "" });
+  }
+
+  handleCustomChange(e) {
+    this.setState({ customTheme: e.target.value });
+  }
+
   handleChange(event) {
     this.setState({
       rpeer: event.target.value,
@@ -263,26 +280,59 @@ class ChatRoom extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-      <div id="lobby">
-        <div>in lobby now</div>
+      <div id="search_room">
+        <div id="search_status">
+          <CircularProgress color="secondary" size={15} />
+          <p id="search_p">You are in search </p>
+        </div>
+        <div id="theme">
+          <p>You can set random theme (by default) or type it by yourself</p>
+          <div id="theme_input">
+            <TextField
+              id="outlined-basic"
+              label="Your theme"
+              variant="outlined"
+              color="secondary"
+              value={this.state.customTheme}
+              onChange={this.handleCustomChange}
+              InputLabelProps={{
+                style: { color: "#ADD8E6" },
+              }}
+              InputProps={{
+                style: { color: "#ADD8E6" },
+              }}
+              disabled={this.state.randTheme}
+            />
+          </div>
+          <div id="theme_checkbox">
+            <p>Random theme</p>
+            <Checkbox
+              checked={this.state.randTheme}
+              onChange={this.handleRandomChange}
+              inputProps={{ "aria-label": "primary checkbox" }}
+            />
+          </div>
+        </div>
+
+        {/* <div>in lobby now</div>
         {this.state.inlobby.map((item, i) => (
           <li key={i}>{item}</li>
-        ))}
+        ))} */}
 
-        {this.state.connState === userStates.NOT_CONNECTED && (
+        {/* {this.state.connState === userStates.NOT_CONNECTED && (
           <button onClick={this.connect}>Connect</button>
-        )}
+        )} */}
 
-        {this.state.connState === userStates.CONNECTING && (
+        {/* {this.state.connState === userStates.CONNECTING && (
           <div>CONNECT LOADER</div>
-        )}
+        )} */}
 
-        {this.state.connState === userStates.CONNECTED && (
+        {/* {this.state.connState === userStates.CONNECTED && (
           <button onClick={this.disconnect}>Disconnect</button>
-        )}
+        )} */}
 
         <br />
-        <div>
+        {/* <div>
           <h1>this is my peer {this.state.peer.id}</h1>
         </div>
         <div>
@@ -296,50 +346,55 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         </div>
         <div>
           <h1>theme is: {this.state.theme}</h1>
-        </div>
-        <br />
-        <div>
-          {this.state.conn ? (
-            <Status
-              status="available"
-              size="xs"
-              name="Connected"
-              style={{
-                marginBottom: "0.5em",
-              }}
-            />
-          ) : (
-            <Status
-              status="unavailable"
-              size="xs"
-              name="Disconnected"
-              style={{
-                marginBottom: "0.5em",
-              }}
-            />
-          )}
-        </div>
-        <div style={{ position: "relative", height: "500px" }}>
-          <MainContainer>
-            <ChatContainer>
-              <MessageList autoScrollToBottom={true}>
-                {this.state.messages.map((item, index) => (
-                  <Message model={item} key={index} />
-                ))}
-                {this.state.typing && (
-                  <TypingIndicator content={`${this.state.rname} is typing`} />
-                )}
-              </MessageList>
-              <MessageInput
-                placeholder="Type message here"
-                attachButton={false}
-                value={this.state.message}
-                onChange={this.handleMessage}
-                onSend={this.sendMessage}
-              />
-            </ChatContainer>
-          </MainContainer>
-        </div>
+        </div> */}
+        {this.state.inChat && (
+          <div id="chat_room">
+            <div>
+              {this.state.conn ? (
+                <Status
+                  status="available"
+                  size="xs"
+                  name="Connected"
+                  style={{
+                    marginBottom: "0.5em",
+                  }}
+                />
+              ) : (
+                <Status
+                  status="unavailable"
+                  size="xs"
+                  name="Disconnected"
+                  style={{
+                    marginBottom: "0.5em",
+                  }}
+                />
+              )}
+            </div>
+            <div style={{ position: "relative", height: "500px" }}>
+              <MainContainer>
+                <ChatContainer>
+                  <MessageList autoScrollToBottom={true}>
+                    {this.state.messages.map((item, index) => (
+                      <Message model={item} key={index} />
+                    ))}
+                    {this.state.typing && (
+                      <TypingIndicator
+                        content={`${this.state.rname} is typing`}
+                      />
+                    )}
+                  </MessageList>
+                  <MessageInput
+                    placeholder="Type message here"
+                    attachButton={false}
+                    value={this.state.message}
+                    onChange={this.handleMessage}
+                    onSend={this.sendMessage}
+                  />
+                </ChatContainer>
+              </MainContainer>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

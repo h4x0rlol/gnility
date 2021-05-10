@@ -87,4 +87,28 @@ a:active {
 #arrow:hover {
   border: solid var(--main-highlight-color);
   border-width: 0 10px 10px 0;
+  cursor: pointer;
+}
+
+#lobby {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 13px;
+}
+
+#back_arrow {
+  display: flex;
+  border: solid var(--main-accent-color);
+  border-width: 0 10px 10px 0;
+  padding: 10px;
+  margin-left: 15px;
+  transform: rotate(225deg);
+  -webkit-transform: rotate(225deg);
+}
+#back_arrow:hover {
+  border: solid var(--main-highlight-color);
+  border-width: 0 10px 10px 0;
+  cursor: pointer;
 }

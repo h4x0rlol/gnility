@@ -1,0 +1,28 @@
+#search_room {
+  display: flex;
+  margin-top: 30px;
+  font-size: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: lightblue;
+}
+
+#search_status {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+}
+
+#search_p {
+  margin-left: 10px;
+}
+
+#theme_checkbox {
+  display: flex;
+  justify-self: center;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 30%;
+}

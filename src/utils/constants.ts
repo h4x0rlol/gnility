@@ -29,6 +29,9 @@ export type MyState = {
   rname: any;
   theme: any;
   lconn: any;
+  inChat: any;
+  randTheme: any;
+  customTheme: any;
 };
 
 // Delay function
