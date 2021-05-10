@@ -64,7 +64,8 @@ a {
   margin-left: 5px;
   font-size: 18.72px;
   color: inherit;
-  text-decoration: none;
+  text-decoration: underline;
+  color: var(--main-accent-color);
 }
 
 a:hover {

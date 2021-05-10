@@ -263,7 +263,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-      <div>
+      <div id="lobby">
         <div>in lobby now</div>
         {this.state.inlobby.map((item, i) => (
           <li key={i}>{item}</li>

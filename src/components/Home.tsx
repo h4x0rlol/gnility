@@ -1,15 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../assets/styles/home.css";
 import Main from "./Main";
+import scrollIntoView from "scroll-into-view-if-needed";
 
 export const Home = () => {
   const [inSearch, setInSearch] = useState(false);
+  const [lobby, setLobby] = useState(null);
+  useEffect(() => {
+    const node = document.getElementById("lobby");
+    setLobby(node);
+  }, []);
+
   const handlePress = () => {
     setInSearch(!inSearch);
+    console.log(lobby);
+    if (lobby) {
+      scrollIntoView(lobby, {
+        block: "center",
+        inline: "center",
+        behavior: "smooth",
+      });
+    }
   };
   return (
     <div>
-      {/* <button onClick={handlePress}>press</button> */}
       {!inSearch ? (
         <div id="home">
           <img id="logo" src="/images/logo.png" alt="logo.png" />
@@ -21,7 +35,7 @@ export const Home = () => {
               <h2>Start chating</h2>
             </div>
             <div>
-              <i id="arrow"></i>
+              <i id="arrow" onClick={handlePress}></i>
             </div>
           </div>
           <div id="home_link">
