@@ -12,10 +12,12 @@ export const userStates = {
 };
 
 // Props for component
-export type MyProps = {};
+export type ChatProps = {
+  name: any;
+};
 
 // State for component
-export type MyState = {
+export type ChatState = {
   peer: any;
   peer_id: any;
   conn: any;
@@ -25,12 +27,19 @@ export type MyState = {
   messages: any;
   rpeer: any;
   typing: any;
-  myname: any;
   rname: any;
   theme: any;
   lconn: any;
   inChat: any;
   customTheme: any;
+};
+
+export type MainProps = {
+  name: any;
+};
+
+export type MainState = {
+  name: any;
 };
 
 // Delay function

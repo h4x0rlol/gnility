@@ -13,6 +13,6 @@ const customConfig: Config = {
   style: "capital",
 };
 
-export function getRandomName() {
+export async function getRandomName() {
   return uniqueNamesGenerator(customConfig);
 }

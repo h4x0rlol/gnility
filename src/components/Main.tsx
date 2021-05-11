@@ -4,13 +4,14 @@ import "../assets/styles/styles.min.css";
 import "../assets/styles/custom.css";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
-import Checkbox from "@material-ui/core/Checkbox";
 import { getRandomName } from "../utils/generateRandomName";
 import { makeRequest } from "../utils/getRandomTheme";
 import {
   delay,
-  MyProps,
-  MyState,
+  ChatProps,
+  ChatState,
+  MainProps,
+  MainState,
   userStates,
   LOBBY_NAME,
 } from "../utils/constants";
@@ -31,7 +32,7 @@ import {
 
 */
 
-class ChatRoom extends React.Component<MyProps, MyState> {
+class ChatRoom extends React.Component<ChatProps, ChatState> {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -52,7 +53,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
       messages: [],
       rpeer: "",
       typing: false,
-      myname: getRandomName(),
       rname: "",
       theme: "",
       lconn: undefined,
@@ -88,7 +88,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         conn.on("open", () => {
           conn.send({
             id: userStates.USERNAME,
-            name: this.state.myname,
+            name: this.props.name,
           });
         });
         conn.on("data", (data) => {
@@ -137,9 +137,8 @@ class ChatRoom extends React.Component<MyProps, MyState> {
   }
 
   async join() {
-    const rp = this.state.inlobby[
-      Math.floor(Math.random() * this.state.inlobby.length)
-    ];
+    const rp =
+      this.state.inlobby[Math.floor(Math.random() * this.state.inlobby.length)];
     if (rp && rp != this.state.peer_id) {
       console.log("connect to", rp);
       const conn = this.state.peer.connect(rp);
@@ -149,7 +148,7 @@ class ChatRoom extends React.Component<MyProps, MyState> {
         this.setState({ conn: conn, connState: userStates.CONNECTED });
         conn.send({
           id: userStates.USERNAME,
-          name: this.state.myname,
+          name: this.props.name,
         });
       });
       conn.on("data", (data) => {
@@ -275,6 +274,9 @@ class ChatRoom extends React.Component<MyProps, MyState> {
   render() {
     return (
       <div id="search_room">
+        <div id="name">
+          <p>{this.props.name}</p>
+        </div>
         <div id="search_status">
           <CircularProgress color="secondary" size={20} />
           <p id="search_p">You are in search </p>
@@ -298,7 +300,6 @@ class ChatRoom extends React.Component<MyProps, MyState> {
             />
           </div>
         </div>
-
         {/* <div>in lobby now</div>
         {this.state.inlobby.map((item, i) => (
           <li key={i}>{item}</li>
@@ -385,10 +386,28 @@ class ChatRoom extends React.Component<MyProps, MyState> {
   }
 }
 
-class Main extends React.Component {
+class Main extends React.Component<MainProps, MainState> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: "",
+    };
+  }
+
+  async getName() {
+    if (this.props.name === "") {
+      console.log("in if");
+      this.setState({ name: await getRandomName() });
+    } else {
+      this.setState({ name: this.props.name });
+    }
+  }
+
   componentDidMount() {
     console.log("trying to create lobby");
 
+    this.getName();
     let peers = {};
 
     const lobby = new Peer(LOBBY_NAME);
@@ -421,7 +440,7 @@ class Main extends React.Component {
   }
 
   render() {
-    return <ChatRoom />;
+    return <ChatRoom name={this.state.name} />;
   }
 }
 

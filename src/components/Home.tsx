@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "../assets/styles/home.css";
 import Main from "./Main";
+import TextField from "@material-ui/core/TextField";
 
 // MOVE NAME GENERATION HERE
 export const Home = () => {
   const [inSearch, setInSearch] = useState(true);
+  const [name, setName] = useState("");
 
   const handlePress = () => {
     setInSearch(!inSearch);
+  };
+
+  const handleChange = (e) => {
+    setName(e.target.value);
   };
 
   return (
@@ -22,7 +28,21 @@ export const Home = () => {
             <div>
               <h2>Start chating</h2>
             </div>
-            <div>
+            <TextField
+              id="outlined-basic"
+              label="Your name"
+              variant="outlined"
+              color="secondary"
+              value={name}
+              onChange={handleChange}
+              InputLabelProps={{
+                style: { color: "#ADD8E6" },
+              }}
+              InputProps={{
+                style: { color: "#ADD8E6" },
+              }}
+            />
+            <div id="arrow_div">
               <i id="arrow" onClick={handlePress}></i>
             </div>
           </div>
@@ -34,7 +54,7 @@ export const Home = () => {
       ) : (
         <div id="lobby">
           <i id="back_arrow" onClick={handlePress}></i>
-          <Main />
+          <Main name={name} />
         </div>
       )}
     </div>
