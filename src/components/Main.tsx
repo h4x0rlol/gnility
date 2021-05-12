@@ -26,13 +26,6 @@ import {
   Status,
 } from "@chatscope/chat-ui-kit-react";
 
-/* TODO
-
-  RANDOM THEMES
-  UI
-
-*/
-
 class ChatRoom extends React.Component<ChatProps, ChatState> {
   constructor(props) {
     super(props);
@@ -63,31 +56,31 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       search: false,
       awaiting: false,
     };
-  }
 
-  componentDidMount() {
-    this.state.peer.on("open", (id) => {
+    this.state.peer.on("open", async (id) => {
       this.setState({ peer_id: id });
-      const lconn = this.state.peer.connect(LOBBY_NAME);
+      const lconn = await this.state.peer.connect(LOBBY_NAME);
       this.setState({ lconn: lconn });
-      this.state.lconn.on("open", () => {
-        console.log("connected to lobby");
-        const lobby_query = () => {
-          lconn.send("QUERY");
-          if (this.state.connState === userStates.NOT_CONNECTED) {
-            lconn.send("READY");
-          }
-          window.setTimeout(lobby_query, 100);
-        };
-        lobby_query();
-      });
-      this.state.lconn.on("data", (data) => {
-        console.log("setting lobby", data);
-        this.setState({ inlobby: data });
-      });
+      if (this.state.lconn) {
+        await this.state.lconn.on("open", async () => {
+          console.log("connected to lobby");
+          const lobby_query = async () => {
+            await this.state.lconn.send("QUERY");
+            if (this.state.connState === userStates.NOT_CONNECTED) {
+              await this.state.lconn.send("READY");
+            }
+            setTimeout(lobby_query, 100);
+          };
+          await lobby_query();
+        });
+        await this.state.lconn.on("data", async (data) => {
+          console.log("setting lobby", data);
+          this.setState({ inlobby: data });
+        });
+      }
     });
 
-    this.state.peer.on("connection", (conn) => {
+    this.state.peer.on("connection", async (conn) => {
       console.log("got connection from", conn.peer);
       if (this.state.conn == null) {
         this.setState({
@@ -102,13 +95,13 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           //   let theme = await makeRequest();
           //   this.setState({ theme: theme });
           // }
-          conn.send({
+          await conn.send({
             id: userStates.USERNAME,
             name: this.props.name,
             // theme: this.state.theme,
           });
         });
-        conn.on("data", (data) => {
+        conn.on("data", async (data) => {
           console.log("Received", data);
           if (data === userStates.NOT_CONNECTED) {
             console.log("TEB9 POSLALI NAHUI");
@@ -152,12 +145,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         });
       } else {
         console.log("already connected");
-        conn.close();
+        await conn.close();
       }
     });
-    window.addEventListener("beforeunload", (ev) => {
+    window.addEventListener("beforeunload", async (ev) => {
       ev.preventDefault();
-      this.disconnect();
+      await this.disconnect();
     });
   }
 
@@ -170,7 +163,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     }
     if (rp && rp != this.state.peer_id) {
       console.log("connect to", rp);
-      const conn = this.state.peer.connect(rp);
+      const conn = await this.state.peer.connect(rp);
       conn.on("open", async () => {
         // console.log("TRYING NEW CONNECTION", conn);
         console.log("connection open");
@@ -180,13 +173,13 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           search: false,
           inChat: true,
         });
-        conn.send({
+        await conn.send({
           id: userStates.USERNAME,
           name: this.props.name,
           theme: this.state.theme,
         });
       });
-      conn.on("data", (data) => {
+      conn.on("data", async (data) => {
         console.log("Received back", data);
         // console.log("disconnect", data);
         if (data === userStates.NOT_CONNECTED) {
@@ -229,17 +222,17 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       });
     } else {
       await delay(1000);
-      this.join();
+      await this.join();
     }
   }
 
-  connect() {
+  async connect() {
     this.setState({ connState: userStates.CONNECTING, search: true });
-    this.join();
+    await this.join();
     console.log(this.state.theme);
   }
 
-  getBack() {
+  async getBack() {
     this.setState({
       awaiting: false,
       connState: userStates.NOT_CONNECTED,
@@ -248,11 +241,11 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     });
   }
 
-  handleThemeChange(e) {
+  async handleThemeChange(e) {
     this.setState({ theme: e.target.value });
   }
 
-  handleChange(event) {
+  async handleChange(event) {
     this.setState({
       rpeer: event.target.value,
     });
@@ -271,9 +264,9 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     }
   }
 
-  sendMessage() {
+  async sendMessage() {
     if (this.state.conn) {
-      this.state.conn.send(this.state.message);
+      await this.state.conn.send(this.state.message);
       this.setState((prevState) => ({
         messages: [
           ...prevState.messages,
@@ -291,9 +284,9 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     }
   }
 
-  disconnect() {
+  async disconnect() {
     if (this.state.conn) {
-      this.state.conn.send(userStates.NOT_CONNECTED);
+      await this.state.conn.send(userStates.NOT_CONNECTED);
       console.log("sended je");
     } else {
       console.log("no con?");
@@ -307,24 +300,24 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     });
   }
 
-  handleMessage(value) {
+  async handleMessage(value) {
     if (this.state.conn) {
-      this.state.conn.send(userStates.TYPING);
+      await this.state.conn.send(userStates.TYPING);
     } else {
       console.log("no con?");
     }
     this.setState({ message: value });
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
     if (this.state.conn) {
-      this.state.conn.send(userStates.NOT_CONNECTED);
+      await this.state.conn.send(userStates.NOT_CONNECTED);
       console.log("sended je");
     } else {
       console.log("no con?");
     }
     if (this.state.lconn) {
-      this.state.lconn.close();
+      await this.state.lconn.close();
     }
 
     this.setState = (state, callback) => {
@@ -499,20 +492,20 @@ class Main extends React.Component<MainProps, MainState> {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     console.log("trying to create lobby");
 
     this.getName();
     let peers = {};
 
     const lobby = new Peer(LOBBY_NAME);
-    lobby.on("open", (id) => {
+    lobby.on("open", async (id) => {
       console.log("Lobby peer ID is: " + id);
     });
 
-    lobby.on("connection", (conn) => {
+    lobby.on("connection", async (conn) => {
       console.log("lobby connection", conn.peer);
-      conn.on("data", (data) => {
+      conn.on("data", async (data) => {
         if (data === "READY") {
           peers[conn.peer] = new Date().getTime();
         }
@@ -522,16 +515,16 @@ class Main extends React.Component<MainProps, MainState> {
       });
     });
 
-    function expire() {
+    const expire = async () => {
       for (let k in peers) {
         let now = new Date().getTime();
         if (now - peers[k] > 1500) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 100);
-    }
-    expire();
+      setTimeout(expire, 100);
+    };
+    await expire();
   }
 
   render() {
