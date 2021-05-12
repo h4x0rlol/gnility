@@ -215,6 +215,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     this.setState({
       awaiting: false,
       connState: userStates.NOT_CONNECTED,
+      inChat: false,
     });
   }
 
@@ -259,6 +260,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       conn: undefined,
       connState: userStates.NOT_CONNECTED,
       rname: "",
+      inChat: false,
     });
   }
 
@@ -344,49 +346,82 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           </div>
         )}
 
-        {this.state.awaiting && (
-          <div id="awaiting">
-            <Button variant="contained" onClick={this.getBack}>
-              Back to lobby
-            </Button>
-          </div>
-        )}
-
         {this.state.inChat && (
           <div id="chat_room">
-            <div>
-              {this.state.conn ? (
-                <Status
-                  status="available"
-                  size="xs"
-                  name="Connected"
-                  style={{
-                    marginBottom: "0.5em",
-                  }}
-                />
-              ) : (
-                <Status
-                  status="unavailable"
-                  size="xs"
-                  name="Disconnected"
-                  style={{
-                    marginBottom: "0.5em",
-                  }}
-                />
+            <div id="chat_info">
+              <p>{this.props.name}</p>
+              <p>You chatting with: {this.state.rname}</p>
+              <div id="chat_theme">
+                <p>Theme is {this.state.theme}</p>
+                <div id="theme_button">
+                  <Button variant="contained" size="small">
+                    switch
+                  </Button>
+                </div>
+                {!this.state.awaiting ? (
+                  <div id="theme_button">
+                    <Button
+                      variant="contained"
+                      onClick={this.disconnect}
+                      size="small"
+                    >
+                      disconnect
+                    </Button>
+                  </div>
+                ) : (
+                  <div id="theme_button">
+                    <Button
+                      variant="contained"
+                      onClick={this.getBack}
+                      size="small"
+                    >
+                      Back to lobby
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div id="chat_indicators">
+              <div id="connect_status">
+                {this.state.conn ? (
+                  <Status status="available" size="lg">
+                    <div
+                      style={{
+                        color: "lightblue",
+                      }}
+                    >
+                      Connected
+                    </div>
+                  </Status>
+                ) : (
+                  <Status status="unavailable" size="lg">
+                    <div
+                      style={{
+                        color: "lightblue",
+                      }}
+                    >
+                      Disconnected
+                    </div>
+                  </Status>
+                )}
+              </div>
+              {this.state.typing && (
+                <div id="typing_status">
+                  <TypingIndicator content={`${this.state.rname} is typing`} />
+                </div>
               )}
             </div>
-            <div style={{ position: "relative", height: "500px" }}>
+            <div id="chat_container">
               <MainContainer>
-                <ChatContainer>
+                <ChatContainer
+                  style={{
+                    backgroundColor: "#2b2b2b",
+                  }}
+                >
                   <MessageList autoScrollToBottom={true}>
                     {this.state.messages.map((item, index) => (
                       <Message model={item} key={index} />
                     ))}
-                    {this.state.typing && (
-                      <TypingIndicator
-                        content={`${this.state.rname} is typing`}
-                      />
-                    )}
                   </MessageList>
                   <MessageInput
                     placeholder="Type message here"
