@@ -9,7 +9,7 @@ export const userStates = {
   AWAITING: "5a3320de-dbd7-4fb5-afb4-264828daa614",
   TYPING: "4b02ae8f-c2de-4251-8176-1f275db86ceb",
   USERNAME: "9f1b62a0-bb44-4ae1-b0d7-0c870020c03d",
-  THEME: "484f05a0-7cee-41cf-bddb-acd830825a72",
+  SWITCH: "484f05a0-7cee-41cf-bddb-acd830825a72",
 };
 
 // Props for component

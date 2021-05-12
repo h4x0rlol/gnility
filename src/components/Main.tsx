@@ -43,6 +43,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     this.sendMessage = this.sendMessage.bind(this);
     this.handleThemeChange = this.handleThemeChange.bind(this);
     this.getBack = this.getBack.bind(this);
+    this.sendSwitchRequest = this.sendSwitchRequest.bind(this);
 
     this.state = {
       peer: new Peer(),
@@ -127,6 +128,11 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
               rname: data.name,
               theme: data.theme,
             });
+          } else if (data.id === userStates.SWITCH) {
+            // console.log("dated");
+            this.setState({
+              theme: data.theme,
+            });
           } else {
             this.setState({ typing: false });
             this.setState((prevState) => ({
@@ -198,6 +204,11 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
             rname: data.name,
             // theme: data.theme,
           });
+        } else if (data.id === userStates.SWITCH) {
+          // console.log("dated");
+          this.setState({
+            theme: data.theme,
+          });
         } else {
           this.setState({ typing: false });
           this.setState((prevState) => ({
@@ -241,6 +252,19 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     this.setState({
       rpeer: event.target.value,
     });
+  }
+
+  async sendSwitchRequest() {
+    if (this.state.conn) {
+      let theme = await makeRequest();
+      this.setState({ theme: theme });
+      this.state.conn.send({
+        id: userStates.SWITCH,
+        theme: this.state.theme,
+      });
+    } else {
+      console.log("no con?");
+    }
   }
 
   sendMessage() {
@@ -362,7 +386,11 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
               <div id="chat_theme">
                 <p>Theme is {this.state.theme}</p>
                 <div id="theme_button">
-                  <Button variant="contained" size="small">
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={this.sendSwitchRequest}
+                  >
                     switch
                   </Button>
                 </div>
