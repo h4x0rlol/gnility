@@ -18,3 +18,20 @@
 #search_p {
   margin-left: 10px;
 }
+
+#button {
+  margin-top: 15px;
+}
+
+#search_loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 40px;
+  margin-top: 300px;
+}
+
+#awaiting {
+  margin-top: 20px;
+}

@@ -4,6 +4,7 @@ import "../assets/styles/styles.min.css";
 import "../assets/styles/custom.css";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 import { getRandomName } from "../utils/generateRandomName";
 import { makeRequest } from "../utils/getRandomTheme";
 import {
@@ -42,6 +43,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     this.sendMessage = this.sendMessage.bind(this);
     this.getTheme = this.getTheme.bind(this);
     this.handleCustomChange = this.handleCustomChange.bind(this);
+    this.getBack = this.getBack.bind(this);
 
     this.state = {
       peer: new Peer(),
@@ -58,6 +60,8 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       lconn: undefined,
       inChat: false,
       customTheme: "",
+      search: false,
+      awaiting: false,
     };
 
     this.state.peer.on("open", (id) => {
@@ -76,7 +80,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         lobby_query();
       });
       this.state.lconn.on("data", (data) => {
-        // console.log("setting lobby", data);
+        console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -84,7 +88,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     this.state.peer.on("connection", (conn) => {
       console.log("got connection from", conn.peer);
       if (this.state.conn == null) {
-        this.setState({ conn: conn, connState: userStates.CONNECTED });
+        this.setState({
+          conn: conn,
+          connState: userStates.CONNECTED,
+          search: false,
+          inChat: true,
+        });
         conn.on("open", () => {
           conn.send({
             id: userStates.USERNAME,
@@ -99,8 +108,9 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
             // console.log("NEW CONN", conn);
             this.setState({
               conn: undefined,
-              connState: userStates.NOT_CONNECTED,
+              connState: userStates.AWAITING,
               rname: "",
+              awaiting: true,
             });
           } else if (data === userStates.TYPING) {
             this.setState({
@@ -145,7 +155,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       conn.on("open", () => {
         // console.log("TRYING NEW CONNECTION", conn);
         console.log("connection open");
-        this.setState({ conn: conn, connState: userStates.CONNECTED });
+        this.setState({
+          conn: conn,
+          connState: userStates.CONNECTED,
+          search: false,
+          inChat: true,
+        });
         conn.send({
           id: userStates.USERNAME,
           name: this.props.name,
@@ -158,8 +173,9 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           console.log("TEB9 POSLALI NAHUI");
           this.setState({
             conn: undefined,
-            connState: userStates.NOT_CONNECTED,
+            connState: userStates.AWAITING,
             rname: "",
+            awaiting: true,
           });
         } else if (data === userStates.TYPING) {
           this.setState({
@@ -191,8 +207,15 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
   }
 
   connect() {
-    this.setState({ connState: userStates.CONNECTING });
+    this.setState({ connState: userStates.CONNECTING, search: true });
     this.join();
+  }
+
+  getBack() {
+    this.setState({
+      awaiting: false,
+      connState: userStates.NOT_CONNECTED,
+    });
   }
 
   handleCustomChange(e) {
@@ -273,66 +296,62 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
 
   render() {
     return (
-      <div id="search_room">
-        <div id="name">
-          <p>{this.props.name}</p>
-        </div>
-        <div id="search_status">
-          <CircularProgress color="secondary" size={20} />
-          <p id="search_p">You are in search </p>
-        </div>
-        <div id="theme">
-          <p>You can set random theme (by default) or type it by yourself</p>
-          <div id="theme_input">
-            <TextField
-              id="outlined-basic"
-              label="Your theme"
-              variant="outlined"
-              color="secondary"
-              value={this.state.customTheme}
-              onChange={this.handleCustomChange}
-              InputLabelProps={{
-                style: { color: "#ADD8E6" },
-              }}
-              InputProps={{
-                style: { color: "#ADD8E6" },
-              }}
-            />
+      <div>
+        {!this.state.search &&
+          !this.state.awaiting &&
+          this.state.connState != userStates.CONNECTED && (
+            <div id="search_room">
+              <div id="name">
+                <p>{this.props.name}</p>
+              </div>
+              <div id="search_status">
+                <CircularProgress color="secondary" size={20} />
+                <p id="search_p">You are in search </p>
+              </div>
+              <div id="theme">
+                <p>
+                  You can set random theme (by default) or type it by yourself
+                </p>
+                <div id="theme_input">
+                  <TextField
+                    id="outlined-basic"
+                    label="Your theme"
+                    variant="outlined"
+                    color="secondary"
+                    value={this.state.customTheme}
+                    onChange={this.handleCustomChange}
+                    InputLabelProps={{
+                      style: { color: "#ADD8E6" },
+                    }}
+                    InputProps={{
+                      style: { color: "#ADD8E6" },
+                    }}
+                  />
+                </div>
+                <div id="button">
+                  <Button variant="contained" onClick={this.connect}>
+                    Search manually
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        {this.state.search && (
+          <div id="search_loader">
+            <p>Searching for interlocutor</p>
+            <CircularProgress color="secondary" size={50} />
           </div>
-        </div>
-        {/* <div>in lobby now</div>
-        {this.state.inlobby.map((item, i) => (
-          <li key={i}>{item}</li>
-        ))} */}
+        )}
 
-        {/* {this.state.connState === userStates.NOT_CONNECTED && (
-          <button onClick={this.connect}>Connect</button>
-        )} */}
+        {this.state.awaiting && (
+          <div id="awaiting">
+            <Button variant="contained" onClick={this.getBack}>
+              Back to lobby
+            </Button>
+          </div>
+        )}
 
-        {/* {this.state.connState === userStates.CONNECTING && (
-          <div>CONNECT LOADER</div>
-        )} */}
-
-        {/* {this.state.connState === userStates.CONNECTED && (
-          <button onClick={this.disconnect}>Disconnect</button>
-        )} */}
-
-        <br />
-        {/* <div>
-          <h1>this is my peer {this.state.peer.id}</h1>
-        </div>
-        <div>
-          <h1>this is name {this.state.myname}</h1>
-        </div>
-        <div>
-          <h1>this is rname {this.state.rname}</h1>
-        </div>
-        <div>
-          <button onClick={this.getTheme}>WIKI</button>
-        </div>
-        <div>
-          <h1>theme is: {this.state.theme}</h1>
-        </div> */}
         {this.state.inChat && (
           <div id="chat_room">
             <div>
