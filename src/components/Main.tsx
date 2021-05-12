@@ -75,12 +75,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 100);
+          window.setTimeout(lobby_query, 1000);
         };
         lobby_query();
       });
       this.state.lconn.on("data", (data) => {
-        // console.log("setting lobby", data);
+        console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -520,11 +520,11 @@ class Main extends React.Component<MainProps, MainState> {
     function expire() {
       for (let k in peers) {
         let now = new Date().getTime();
-        if (now - peers[k] > 1500) {
+        if (now - peers[k] > 3000) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 100);
+      window.setTimeout(expire, 1000);
     }
     expire();
   }
