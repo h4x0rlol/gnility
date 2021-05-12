@@ -41,8 +41,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
     this.disconnect = this.disconnect.bind(this);
     this.handleMessage = this.handleMessage.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
-    this.getTheme = this.getTheme.bind(this);
-    this.handleCustomChange = this.handleCustomChange.bind(this);
+    this.handleThemeChange = this.handleThemeChange.bind(this);
     this.getBack = this.getBack.bind(this);
 
     this.state = {
@@ -80,7 +79,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         lobby_query();
       });
       this.state.lconn.on("data", (data) => {
-        console.log("setting lobby", data);
+        // console.log("setting lobby", data);
         this.setState({ inlobby: data });
       });
     });
@@ -94,10 +93,16 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           search: false,
           inChat: true,
         });
-        conn.on("open", () => {
+        conn.on("open", async () => {
+          console.log("this is theme", this.state.theme);
+          // if (this.state.theme === "") {
+          //   let theme = await makeRequest();
+          //   this.setState({ theme: theme });
+          // }
           conn.send({
             id: userStates.USERNAME,
             name: this.props.name,
+            // theme: this.state.theme,
           });
         });
         conn.on("data", (data) => {
@@ -120,6 +125,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
             // console.log("dated");
             this.setState({
               rname: data.name,
+              theme: data.theme,
             });
           } else {
             this.setState({ typing: false });
@@ -149,10 +155,14 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
   async join() {
     const rp =
       this.state.inlobby[Math.floor(Math.random() * this.state.inlobby.length)];
+    if (this.state.theme === "") {
+      let theme = await makeRequest();
+      this.setState({ theme: theme });
+    }
     if (rp && rp != this.state.peer_id) {
       console.log("connect to", rp);
       const conn = this.state.peer.connect(rp);
-      conn.on("open", () => {
+      conn.on("open", async () => {
         // console.log("TRYING NEW CONNECTION", conn);
         console.log("connection open");
         this.setState({
@@ -164,6 +174,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         conn.send({
           id: userStates.USERNAME,
           name: this.props.name,
+          theme: this.state.theme,
         });
       });
       conn.on("data", (data) => {
@@ -185,6 +196,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           // console.log("dated");
           this.setState({
             rname: data.name,
+            // theme: data.theme,
           });
         } else {
           this.setState({ typing: false });
@@ -209,6 +221,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
   connect() {
     this.setState({ connState: userStates.CONNECTING, search: true });
     this.join();
+    console.log(this.state.theme);
   }
 
   getBack() {
@@ -216,11 +229,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       awaiting: false,
       connState: userStates.NOT_CONNECTED,
       inChat: false,
+      theme: "",
     });
   }
 
-  handleCustomChange(e) {
-    this.setState({ customTheme: e.target.value });
+  handleThemeChange(e) {
+    this.setState({ theme: e.target.value });
   }
 
   handleChange(event) {
@@ -243,7 +257,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         ],
       }));
       this.setState({ message: "" });
-      this.setState({ typing: false });
+      // this.setState({ typing: false });
     } else {
       console.log("no con?");
     }
@@ -261,6 +275,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       connState: userStates.NOT_CONNECTED,
       rname: "",
       inChat: false,
+      theme: "",
     });
   }
 
@@ -271,13 +286,6 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       console.log("no con?");
     }
     this.setState({ message: value });
-  }
-
-  async getTheme() {
-    let theme = await makeRequest();
-    this.setState({
-      theme: theme,
-    });
   }
 
   componentWillUnmount() {
@@ -320,8 +328,8 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
                     label="Your theme"
                     variant="outlined"
                     color="secondary"
-                    value={this.state.customTheme}
-                    onChange={this.handleCustomChange}
+                    value={this.state.theme}
+                    onChange={this.handleThemeChange}
                     InputLabelProps={{
                       style: { color: "#ADD8E6" },
                     }}
