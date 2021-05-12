@@ -63,7 +63,9 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       search: false,
       awaiting: false,
     };
+  }
 
+  componentDidMount() {
     this.state.peer.on("open", (id) => {
       this.setState({ peer_id: id });
       const lconn = this.state.peer.connect(LOBBY_NAME);
@@ -75,7 +77,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           if (this.state.connState === userStates.NOT_CONNECTED) {
             lconn.send("READY");
           }
-          window.setTimeout(lobby_query, 1000);
+          window.setTimeout(lobby_query, 100);
         };
         lobby_query();
       });
@@ -117,6 +119,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
               connState: userStates.AWAITING,
               rname: "",
               awaiting: true,
+              typing: false,
             });
           } else if (data === userStates.TYPING) {
             this.setState({
@@ -193,6 +196,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
             connState: userStates.AWAITING,
             rname: "",
             awaiting: true,
+            typing: false,
           });
         } else if (data === userStates.TYPING) {
           this.setState({
@@ -465,6 +469,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
                     value={this.state.message}
                     onChange={this.handleMessage}
                     onSend={this.sendMessage}
+                    autoFocus={true}
                   />
                 </ChatContainer>
               </MainContainer>
@@ -520,11 +525,11 @@ class Main extends React.Component<MainProps, MainState> {
     function expire() {
       for (let k in peers) {
         let now = new Date().getTime();
-        if (now - peers[k] > 3000) {
+        if (now - peers[k] > 1500) {
           delete peers[k];
         }
       }
-      window.setTimeout(expire, 1000);
+      window.setTimeout(expire, 100);
     }
     expire();
   }
