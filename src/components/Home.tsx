@@ -3,9 +3,8 @@ import "../assets/styles/home.css";
 import Main from "./Main";
 import TextField from "@material-ui/core/TextField";
 
-// MOVE NAME GENERATION HERE
 export const Home = () => {
-  const [inSearch, setInSearch] = useState(true);
+  const [inSearch, setInSearch] = useState(false);
   const [name, setName] = useState("");
 
   const handlePress = () => {

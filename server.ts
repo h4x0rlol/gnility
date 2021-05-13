@@ -1,7 +1,6 @@
 const express = require("express");
 const path = require("path");
 
-const LOBBY_NAME = "gnility";
 const app = express();
 
 let port = process.env.PORT || 3000;

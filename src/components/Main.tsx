@@ -63,7 +63,6 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       this.setState({ lconn: lconn });
       if (this.state.lconn) {
         await this.state.lconn.on("open", async () => {
-          console.log("connected to lobby");
           const lobby_query = async () => {
             await this.state.lconn.send("QUERY");
             if (this.state.connState === userStates.NOT_CONNECTED) {
@@ -74,14 +73,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           await lobby_query();
         });
         await this.state.lconn.on("data", async (data) => {
-          console.log("setting lobby", data);
           this.setState({ inlobby: data });
         });
       }
     });
 
     this.state.peer.on("connection", async (conn) => {
-      console.log("got connection from", conn.peer);
       if (this.state.conn == null) {
         this.setState({
           conn: conn,
@@ -90,23 +87,13 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           inChat: true,
         });
         conn.on("open", async () => {
-          console.log("this is theme", this.state.theme);
-          // if (this.state.theme === "") {
-          //   let theme = await makeRequest();
-          //   this.setState({ theme: theme });
-          // }
           await conn.send({
             id: userStates.USERNAME,
             name: this.props.name,
-            // theme: this.state.theme,
           });
         });
         conn.on("data", async (data) => {
-          console.log("Received", data);
           if (data === userStates.NOT_CONNECTED) {
-            console.log("TEB9 POSLALI NAHUI");
-            // conn.close();
-            // console.log("NEW CONN", conn);
             this.setState({
               conn: undefined,
               connState: userStates.AWAITING,
@@ -119,13 +106,11 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
               typing: true,
             });
           } else if (data.id === userStates.USERNAME) {
-            // console.log("dated");
             this.setState({
               rname: data.name,
               theme: data.theme,
             });
           } else if (data.id === userStates.SWITCH) {
-            // console.log("dated");
             this.setState({
               theme: data.theme,
             });
@@ -144,7 +129,6 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           }
         });
       } else {
-        console.log("already connected");
         await conn.close();
       }
     });
@@ -162,11 +146,8 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       this.setState({ theme: theme });
     }
     if (rp && rp != this.state.peer_id) {
-      console.log("connect to", rp);
       const conn = await this.state.peer.connect(rp);
       conn.on("open", async () => {
-        // console.log("TRYING NEW CONNECTION", conn);
-        console.log("connection open");
         this.setState({
           conn: conn,
           connState: userStates.CONNECTED,
@@ -180,10 +161,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         });
       });
       conn.on("data", async (data) => {
-        console.log("Received back", data);
-        // console.log("disconnect", data);
         if (data === userStates.NOT_CONNECTED) {
-          console.log("TEB9 POSLALI NAHUI");
           this.setState({
             conn: undefined,
             connState: userStates.AWAITING,
@@ -196,13 +174,10 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
             typing: true,
           });
         } else if (data.id === userStates.USERNAME) {
-          // console.log("dated");
           this.setState({
             rname: data.name,
-            // theme: data.theme,
           });
         } else if (data.id === userStates.SWITCH) {
-          // console.log("dated");
           this.setState({
             theme: data.theme,
           });
@@ -229,7 +204,6 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
   async connect() {
     this.setState({ connState: userStates.CONNECTING, search: true });
     await this.join();
-    console.log(this.state.theme);
   }
 
   async getBack() {
@@ -238,6 +212,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       connState: userStates.NOT_CONNECTED,
       inChat: false,
       theme: "",
+      message: "",
     });
   }
 
@@ -259,8 +234,6 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         id: userStates.SWITCH,
         theme: this.state.theme,
       });
-    } else {
-      console.log("no con?");
     }
   }
 
@@ -278,18 +251,12 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         ],
       }));
       this.setState({ message: "" });
-      // this.setState({ typing: false });
-    } else {
-      console.log("no con?");
     }
   }
 
   async disconnect() {
     if (this.state.conn) {
       await this.state.conn.send(userStates.NOT_CONNECTED);
-      console.log("sended je");
-    } else {
-      console.log("no con?");
     }
     this.setState({
       conn: undefined,
@@ -297,14 +264,13 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
       rname: "",
       inChat: false,
       theme: "",
+      message: "",
     });
   }
 
   async handleMessage(value) {
     if (this.state.conn) {
       await this.state.conn.send(userStates.TYPING);
-    } else {
-      console.log("no con?");
     }
     this.setState({ message: value });
   }
@@ -312,9 +278,6 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
   async componentWillUnmount() {
     if (this.state.conn) {
       await this.state.conn.send(userStates.NOT_CONNECTED);
-      console.log("sended je");
-    } else {
-      console.log("no con?");
     }
     if (this.state.lconn) {
       await this.state.lconn.close();
@@ -485,7 +448,6 @@ class Main extends React.Component<MainProps, MainState> {
 
   async getName() {
     if (this.props.name === "") {
-      console.log("in if");
       this.setState({ name: await getRandomName() });
     } else {
       this.setState({ name: this.props.name });
@@ -493,18 +455,13 @@ class Main extends React.Component<MainProps, MainState> {
   }
 
   async componentDidMount() {
-    console.log("trying to create lobby");
-
     this.getName();
     let peers = {};
 
     const lobby = new Peer(LOBBY_NAME);
-    lobby.on("open", async (id) => {
-      console.log("Lobby peer ID is: " + id);
-    });
+    lobby.on("open", async (id) => {});
 
     lobby.on("connection", async (conn) => {
-      console.log("lobby connection", conn.peer);
       conn.on("data", async (data) => {
         if (data === "READY") {
           peers[conn.peer] = new Date().getTime();

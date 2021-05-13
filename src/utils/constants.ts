@@ -1,3 +1,5 @@
+import Peer from "peerjs";
+
 // Lobby name
 export const LOBBY_NAME = "gnility";
 
@@ -14,35 +16,35 @@ export const userStates = {
 
 // Props for component
 export type ChatProps = {
-  name: any;
+  name: string;
 };
 
 // State for component
 export type ChatState = {
-  peer: any;
-  peer_id: any;
-  conn: any;
-  connState: any;
-  inlobby: any;
-  message: any;
+  peer: Peer;
+  peer_id: string;
+  conn: Peer.DataConnection;
+  connState: string;
+  inlobby: string[];
+  message: string;
   messages: any;
-  rpeer: any;
-  typing: any;
-  rname: any;
-  theme: any;
-  lconn: any;
-  inChat: any;
-  customTheme: any;
-  search: any;
-  awaiting: any;
+  rpeer: string;
+  typing: boolean;
+  rname: string;
+  theme: string;
+  lconn: Peer.DataConnection;
+  inChat: boolean;
+  customTheme: string;
+  search: boolean;
+  awaiting: boolean;
 };
 
 export type MainProps = {
-  name: any;
+  name: string;
 };
 
 export type MainState = {
-  name: any;
+  name: string;
 };
 
 // Delay function

@@ -2,8 +2,8 @@ const TerserPlugin = require("terser-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 module.exports = {
   entry: ["./src/index.tsx"],
-  // mode: "production",
-  mode: "development",
+  mode: "production",
+  // mode: "development",
   output: {
     path: __dirname + "/dist",
     filename: "build.js",

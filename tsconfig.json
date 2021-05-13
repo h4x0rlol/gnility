@@ -5,6 +5,6 @@
     "jsx": "react",
     "esModuleInterop": true,
     "target": "es5",
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "typeRoots": ["node_modules/@types"]
   }
 }
