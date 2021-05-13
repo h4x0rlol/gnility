@@ -1,12 +1,11 @@
 const express = require("express");
 const path = require("path");
+
 const app = express();
 
-let port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(__dirname);
-  console.log("Listening Port " + port);
-});
+let port = process.env.PORT || 3000;
+
+const frontendServer = app.listen(port);
 
 app.use(express.static(__dirname + "/dist"));
 
