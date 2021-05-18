@@ -3,13 +3,12 @@
   --main-accent-color-muted: rgb(168, 0, 0);
   --main-highlight-color: rgb(255, 158, 158);
 }
-
 body {
   margin: 0;
   background-color: #2b2b2b;
   color: lightblue;
   text-align: center;
-  font-family: Sweeney;
+  font-family: "Open Sans", sans-serif;
   line-height: 1.5em;
   background-image: radial-gradient(
     circle,
