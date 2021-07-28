@@ -20,11 +20,13 @@ export const Home = () => {
       {!inSearch ? (
         <div id="home">
           <img id="logo" src="/images/logo.png" alt="logo.png" />
-          <div id="home_text"></div>
-          <h1>is</h1>
-          <h1>a simple WebRTC peer to peer chat on a random themes</h1>
+          <div id="home_text">
+            <h1>is</h1>
+            <h1>a simple WebRTC peer to peer chat on a random themes</h1>
+          </div>
+
           <div id="home_start">
-            <div>
+            <div id="start">
               <h2>Start chating</h2>
             </div>
             <TextField

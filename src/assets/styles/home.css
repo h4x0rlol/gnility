@@ -9,7 +9,6 @@ body {
   background-color: #2b2b2b;
   color: lightblue;
   text-align: center;
-  font-family: Sweeney;
   line-height: 1.5em;
   background-image: radial-gradient(
     circle,
@@ -36,9 +35,15 @@ body {
   margin-top: -7%;
 }
 
+#start {
+  padding: 15px;
+}
 #home_text {
   margin-top: -11%;
-  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #home_start {
@@ -55,7 +60,7 @@ body {
   flex-direction: row;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 17%;
+  margin-top: 14%;
   text-align: center;
 }
 
@@ -79,7 +84,6 @@ a:active {
   border: solid var(--main-accent-color);
   border-width: 0 10px 10px 0;
   padding: 10px;
-  margin-left: 15px;
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
 }
@@ -102,7 +106,9 @@ a:active {
   border: solid var(--main-accent-color);
   border-width: 0 10px 10px 0;
   padding: 10px;
-  margin-left: 15px;
+  margin-top: 10px;
+  margin-right: auto;
+  margin-left: auto;
   transform: rotate(225deg);
   -webkit-transform: rotate(225deg);
 }
@@ -113,7 +119,9 @@ a:active {
 }
 
 #arrow_div {
-  margin-top: 10px;
+  padding: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @media (max-width: 767px) {
@@ -125,5 +133,9 @@ a:active {
 @media (max-width: 480px) {
   body {
     line-height: 2em;
+  }
+
+  #home_text {
+    font-size: 10px;
   }
 }

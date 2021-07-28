@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url(../fonts/SourceSansPro-Regular.ttf);
+}
+
+:root {
+  -webkit-font-smoothing: antialiased;
+  font-family: "Source Sans Pro", sans-serif;
+  line-height: 1.618;
+  font-weight: bold;
+}

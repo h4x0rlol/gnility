@@ -85,6 +85,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
           connState: userStates.CONNECTED,
           search: false,
           inChat: true,
+          messages: [],
         });
         conn.on("open", async () => {
           await conn.send({
@@ -202,7 +203,11 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
   }
 
   async connect() {
-    this.setState({ connState: userStates.CONNECTING, search: true });
+    this.setState({
+      connState: userStates.CONNECTING,
+      search: true,
+      messages: [],
+    });
     await this.join();
   }
 
@@ -334,7 +339,9 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
         {this.state.search && (
           <div id="search_loader">
             <p>Searching for interlocutor</p>
-            <CircularProgress color="secondary" size={50} />
+            <div className="loader">
+              <CircularProgress color="secondary" size={50} />
+            </div>
           </div>
         )}
 
@@ -408,7 +415,7 @@ class ChatRoom extends React.Component<ChatProps, ChatState> {
               )}
             </div>
             <div id="chat_container">
-              <MainContainer>
+              <MainContainer className="dark">
                 <ChatContainer
                   style={{
                     backgroundColor: "#2b2b2b",
