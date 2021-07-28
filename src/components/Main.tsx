@@ -1,3 +1,5 @@
+// inspired by https://github.com/geohot/twitchtactoe
+
 import React from "react";
 import Peer from "peerjs";
 import "../assets/styles/styles.min.css";
