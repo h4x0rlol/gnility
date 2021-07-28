@@ -1,11 +1,27 @@
 #search_room {
   display: flex;
-  margin-top: 100px;
+  margin-top: 20vh;
   font-size: 25px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   color: lightblue;
+}
+
+.loader {
+  padding: 40px;
+}
+
+.scrollbar-container {
+  background-color: #2b2b2b;
+}
+
+.cs-chat-container {
+  background-color: #2b2b2b;
+}
+
+.cs-main-container {
+  border-color: crimson;
 }
 
 #search_status {
@@ -15,12 +31,16 @@
   align-items: center;
 }
 
+#theme_input {
+  padding: 15px;
+}
+
 #search_p {
   margin-left: 10px;
 }
 
 #button {
-  margin-top: 15px;
+  padding: 15px;
 }
 
 #search_loader {
@@ -72,6 +92,11 @@
 @media (max-width: 480px) {
   #chat_container {
     height: 65vh;
+  }
+
+  #search_room {
+    font-size: 15px;
+    margin-top: 15vh;
   }
 }
 
