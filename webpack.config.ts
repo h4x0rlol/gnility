@@ -1,5 +1,3 @@
-const TerserPlugin = require("terser-webpack-plugin");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 module.exports = {
   entry: ["./src/index.tsx"],
   mode: "production",
@@ -18,11 +16,6 @@ module.exports = {
   },
   optimization: {
     minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        cache: true,
-      }),
-    ],
   },
   module: {
     rules: [
@@ -60,5 +53,4 @@ module.exports = {
       },
     ],
   },
-  plugins: [new ForkTsCheckerWebpackPlugin()],
 };
